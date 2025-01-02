@@ -33,6 +33,7 @@ import { formatToCurrencyFromCents } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { EditIcon, EyeIcon } from "lucide-react";
 import { startCase } from "lodash";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const categories = [
   "Food",
@@ -46,27 +47,25 @@ const categories = [
 
 export function Transactions({
   transactions,
+  pagination,
 }: {
   transactions: Transaction[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    nextPage: number | null;
+  };
 }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
 
-  const filteredTransactions = transactions.filter(
-    (transaction) =>
-      transaction.description
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) &&
-      (categoryFilter === "all" || transaction.upCategory === categoryFilter),
-  );
-
-  const pageCount = Math.ceil(filteredTransactions.length / itemsPerPage);
-  const paginatedTransactions = filteredTransactions.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
-  );
+  function setPage(page: number) {
+    const params = new URLSearchParams(searchParams);
+    params.set("page", String(page));
+    router.push(`?${params.toString()}`);
+  }
 
   return (
     <div className="space-y-4">
@@ -107,7 +106,7 @@ export function Transactions({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedTransactions.map((transaction) => (
+            {transactions.map((transaction) => (
               <TableRow key={transaction.id}>
                 <TableCell>
                   {DateTime.fromJSDate(
@@ -200,15 +199,21 @@ export function Transactions({
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              hidden={currentPage === 1}
+              onClick={() => {
+                if (pagination.currentPage === 1) {
+                  return;
+                }
+                setPage(pagination.currentPage - 1);
+              }}
             />
           </PaginationItem>
-          {[...Array(pageCount)].map((_, i) => (
+          {[...Array(pagination.totalPages)].map((_, i) => (
             <PaginationItem key={i}>
               <PaginationLink
-                onClick={() => setCurrentPage(i + 1)}
-                isActive={currentPage === i + 1}
+                onClick={() => {
+                  setPage(i);
+                }}
+                isActive={pagination.currentPage === i + 1}
               >
                 {i + 1}
               </PaginationLink>
@@ -216,10 +221,12 @@ export function Transactions({
           ))}
           <PaginationItem>
             <PaginationNext
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, pageCount))
-              }
-              hidden={currentPage === pageCount}
+              onClick={() => {
+                if (!pagination.nextPage) {
+                  return;
+                }
+                setPage(pagination.nextPage);
+              }}
             />
           </PaginationItem>
         </PaginationContent>
