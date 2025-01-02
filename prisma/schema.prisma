@@ -19,17 +19,17 @@ model Transaction {
 
   // upbank fields
   status               String
-  rawText              String
+  rawText              String?
   description          String
   amountValue          Decimal
   amountCurrencyCode   String
-  cardPurchaseMethod   String
-  cardNumberSuffix     String
+  cardPurchaseMethod   String?
+  cardNumberSuffix     String?
   transactionCreatedAt DateTime
-  transactionSettledAt DateTime
-  upCategory           String
-  upParentCategory     String
-  foreignAmount        Decimal
+  transactionSettledAt DateTime?
+  upCategory           String?
+  upParentCategory     String?
+  foreignAmount        Decimal?
 
   // user fields
   type TransactionType
@@ -47,4 +47,16 @@ model User {
   email String
 
   transactions Transaction[]
+  settings     Settings[]
+}
+
+model Settings {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  upBankApiKey String
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
 }

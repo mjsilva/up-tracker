@@ -5,7 +5,7 @@ export default function Home() {
         <h2 className="text-2xl font-semibold mb-4">Overview</h2>
         <div className="grid gap-4 md:grid-cols-3">
           <div className="p-6 bg-card text-card-foreground rounded-lg shadow">
-            <h3 className="font-medium mb-2">Today's Expenses</h3>
+            <h3 className="font-medium mb-2">Today&#39;s Expenses</h3>
             <p className="text-3xl font-bold">$45.67</p>
           </div>
           <div className="p-6 bg-card text-card-foreground rounded-lg shadow">

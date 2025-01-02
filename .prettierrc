@@ -1,0 +1,12 @@
+{
+  "plugins": [
+    "prettier-plugin-tailwindcss",
+    "prettier-plugin-prisma"
+  ],
+  "tailwindFunctions": [
+    "clsx",
+    "cn",
+    "twmerge",
+    "cva"
+  ]
+}
