@@ -24,6 +24,7 @@ export const UpBankTransactionSchema = z.object({
     status: z.string(),
     rawText: z.string().nullish(), // rawText is nullish
     description: z.string(),
+    message: z.string().nullish(),
     amount: MoneySchema,
     createdAt: isoDateSchema,
     settledAt: isoDateSchema.nullish(), // Can be null if not settled

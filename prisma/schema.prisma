@@ -21,7 +21,8 @@ model Transaction {
   status               String
   rawText              String?
   description          String
-  amountValue          Decimal
+  message              String?
+  amountValueInCents   Int
   amountCurrencyCode   String
   cardPurchaseMethod   String?
   cardNumberSuffix     String?
@@ -29,7 +30,8 @@ model Transaction {
   transactionSettledAt DateTime?
   upCategory           String?
   upParentCategory     String?
-  foreignAmount        Decimal?
+  // foreignAmountValueInCents Int?
+  // foreignAmountValueInCents Int?
 
   // user fields
   type TransactionType

@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Decimal } from "@prisma/client/runtime/library";
 import { UpBankApiResponseSchema } from "@/lib/schemas/upbank";
 import prisma from "@/lib/db";
 import { TransactionType } from "@prisma/client";
@@ -47,6 +46,7 @@ export async function GET(_req: NextRequest) {
           status,
           rawText,
           description,
+          message,
           amount,
           createdAt,
           settledAt,
@@ -56,16 +56,14 @@ export async function GET(_req: NextRequest) {
           category: { data: category },
           parentCategory: { data: parentCategory },
         },
-        foreignAmount,
       } = tx;
-
-      const amountValue = new Decimal(amount.value);
 
       const commonTransactionData = {
         status,
         rawText: rawText ?? null,
         description,
-        amountValue,
+        message: message ? message : null,
+        amountValueInCents: amount.valueInBaseUnits,
         amountCurrencyCode: amount.currencyCode,
         transactionCreatedAt: new Date(createdAt),
         transactionSettledAt: settledAt ? new Date(settledAt) : null,
@@ -73,7 +71,11 @@ export async function GET(_req: NextRequest) {
         cardNumberSuffix: cardPurchaseMethod?.cardNumberSuffix ?? null,
         upCategory: category?.id ?? null,
         upParentCategory: parentCategory?.id ?? null,
-        foreignAmount: foreignAmount ? new Decimal(foreignAmount.value) : null,
+        type:
+          amount.valueInBaseUnits > 0
+            ? TransactionType.INCOME
+            : TransactionType.EXPENSE,
+        // foreignAmount: foreignAmount ? new Decimal(foreignAmount.value) : null,
       };
 
       await prisma.transaction.upsert({
@@ -83,9 +85,6 @@ export async function GET(_req: NextRequest) {
           ...commonTransactionData,
           id,
           userId: "1",
-          type: amountValue.greaterThan(0)
-            ? TransactionType.INCOME
-            : TransactionType.EXPENSE,
         },
       });
     }
