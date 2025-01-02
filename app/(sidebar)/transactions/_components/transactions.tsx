@@ -33,7 +33,7 @@ import { formatToCurrencyFromCents } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { EditIcon, EyeIcon } from "lucide-react";
 import { startCase } from "lodash";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 const categories = [
   "Food",
@@ -56,19 +56,18 @@ export function Transactions({
     nextPage: number | null;
   };
 }) {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
 
-  function setPage(page: number) {
+  function getPageHref(page: number) {
     const params = new URLSearchParams(searchParams);
     params.set("page", String(page));
-    router.push(`?${params.toString()}`);
+    return `?${params.toString()}`;
   }
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col space-y-4">
       <h1 className="text-2xl font-bold">Transactions</h1>
 
       <div className="flex flex-col gap-4 sm:flex-row">
@@ -199,20 +198,17 @@ export function Transactions({
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
-              onClick={() => {
-                if (pagination.currentPage === 1) {
-                  return;
-                }
-                setPage(pagination.currentPage - 1);
-              }}
+              href={
+                pagination.currentPage !== 1
+                  ? getPageHref(pagination.currentPage - 1)
+                  : getPageHref(pagination.currentPage)
+              }
             />
           </PaginationItem>
           {[...Array(pagination.totalPages)].map((_, i) => (
-            <PaginationItem key={i}>
+            <PaginationItem key={i + 1}>
               <PaginationLink
-                onClick={() => {
-                  setPage(i);
-                }}
+                href={getPageHref(i + 1)}
                 isActive={pagination.currentPage === i + 1}
               >
                 {i + 1}
@@ -221,12 +217,11 @@ export function Transactions({
           ))}
           <PaginationItem>
             <PaginationNext
-              onClick={() => {
-                if (!pagination.nextPage) {
-                  return;
-                }
-                setPage(pagination.nextPage);
-              }}
+              href={
+                pagination?.nextPage
+                  ? getPageHref(pagination.nextPage)
+                  : getPageHref(pagination.currentPage)
+              }
             />
           </PaginationItem>
         </PaginationContent>
