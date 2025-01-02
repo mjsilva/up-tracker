@@ -93,7 +93,8 @@ export function Transactions({
       </div>
 
       {/* Desktop view */}
-      <div className="hidden rounded-md border md:block">
+      {/*<div className="hidden rounded-md border md:block">*/}
+      <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
@@ -194,7 +195,7 @@ export function Transactions({
       {/*  ))}*/}
       {/*</div>*/}
 
-      <Pagination>
+      <Pagination className={"justify-end"}>
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
