@@ -1,5 +1,8 @@
 import {
+  ArrowBigUp,
+  ArrowBigUpIcon,
   ArrowLeftRight,
+  ArrowUp,
   LayoutDashboard,
   Menu,
   Settings,
@@ -48,7 +51,9 @@ export function AppSidebar() {
     <>
       <Sidebar>
         <SidebarHeader className="p-4">
-          <h2 className="text-2xl font-bold">Up Bank Tracker</h2>
+          <h2 className="flex items-center gap-2 text-2xl font-bold">
+            <ArrowBigUpIcon size={40} /> Up Tracker
+          </h2>
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
@@ -69,7 +74,7 @@ export function AppSidebar() {
           </SidebarGroup>
         </SidebarContent>
       </Sidebar>
-      <div className="absolute bottom-4 left-4 z-10">
+      <div className="fixed bottom-4 left-4 z-10">
         <SidebarTrigger>
           <Button variant="outline" size="icon">
             <Menu className="h-4 w-4" />
