@@ -11,8 +11,7 @@ export default function Layout({ children }: PropsWithChildren) {
       <SidebarProvider>
         <AppSidebar />
         <div className={"w-full"}>
-          <header className="flex items-center justify-between border-b px-6 py-4">
-            <h1 className="text-2xl font-semibold">Dashboard</h1>
+          <header className="flex items-center justify-end border-b px-6 py-4">
             <div className="flex items-center gap-4">
               <Button variant="ghost" size="icon">
                 <Bell className="h-5 w-5" />

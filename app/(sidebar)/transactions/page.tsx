@@ -36,7 +36,7 @@ async function Page({
   return (
     <Transactions
       transactions={transactions}
-      pagination={{
+      paginationData={{
         currentPage: page,
         totalPages,
         nextPage: hasNextPage ? page + 1 : null,

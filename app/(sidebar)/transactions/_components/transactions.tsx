@@ -19,21 +19,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 import { Transaction } from "@prisma/client";
 import { DateTime } from "luxon";
 import { formatToCurrencyFromCents } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { EditIcon, EyeIcon } from "lucide-react";
 import { startCase } from "lodash";
-import { useSearchParams } from "next/navigation";
+import { Pagination } from "@/app/(sidebar)/transactions/_components/pagination";
+import { PaginationData } from "@/lib/types";
 
 const categories = [
   "Food",
@@ -47,49 +40,41 @@ const categories = [
 
 export function Transactions({
   transactions,
-  pagination,
+  paginationData,
 }: {
   transactions: Transaction[];
-  pagination: {
-    currentPage: number;
-    totalPages: number;
-    nextPage: number | null;
-  };
+  paginationData: PaginationData;
 }) {
-  const searchParams = useSearchParams();
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
-
-  function getPageHref(page: number) {
-    const params = new URLSearchParams(searchParams);
-    params.set("page", String(page));
-    return `?${params.toString()}`;
-  }
 
   return (
     <div className="flex flex-col space-y-4">
       <h1 className="text-2xl font-bold">Transactions</h1>
 
-      <div className="flex flex-col gap-4 sm:flex-row">
-        <Input
-          placeholder="Search transactions..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="max-w-sm"
-        />
-        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-          <SelectTrigger className="max-w-[180px]">
-            <SelectValue placeholder="Filter by category" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Categories</SelectItem>
-            {categories.map((category) => (
-              <SelectItem key={category} value={category}>
-                {category}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      <div className="flex justify-between">
+        <div className={"flex flex-col gap-4 sm:flex-row"}>
+          <Input
+            placeholder="Search transactions..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-96"
+          />
+          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            <SelectTrigger className="max-w-[180px]">
+              <SelectValue placeholder="Filter by category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Categories</SelectItem>
+              {categories.map((category) => (
+                <SelectItem key={category} value={category}>
+                  {category}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <Pagination paginationData={paginationData} />
       </div>
 
       {/* Desktop view */}
@@ -195,38 +180,7 @@ export function Transactions({
       {/*  ))}*/}
       {/*</div>*/}
 
-      <Pagination className={"justify-end"}>
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious
-              href={
-                pagination.currentPage !== 1
-                  ? getPageHref(pagination.currentPage - 1)
-                  : getPageHref(pagination.currentPage)
-              }
-            />
-          </PaginationItem>
-          {[...Array(pagination.totalPages)].map((_, i) => (
-            <PaginationItem key={i + 1}>
-              <PaginationLink
-                href={getPageHref(i + 1)}
-                isActive={pagination.currentPage === i + 1}
-              >
-                {i + 1}
-              </PaginationLink>
-            </PaginationItem>
-          ))}
-          <PaginationItem>
-            <PaginationNext
-              href={
-                pagination?.nextPage
-                  ? getPageHref(pagination.nextPage)
-                  : getPageHref(pagination.currentPage)
-              }
-            />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
+      <Pagination paginationData={paginationData} />
     </div>
   );
 }
