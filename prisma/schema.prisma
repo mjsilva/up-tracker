@@ -49,16 +49,23 @@ model User {
   email String
 
   transactions Transaction[]
-  settings     Settings[]
+  settings     Setting[]
 }
 
-model Settings {
+enum SettingKey {
+  UP_BANK_API_KEY
+}
+
+model Setting {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  upBankApiKey String
+  key   SettingKey
+  value String?
 
   user   User   @relation(fields: [userId], references: [id])
   userId String
+
+  @@unique([userId, key])
 }
