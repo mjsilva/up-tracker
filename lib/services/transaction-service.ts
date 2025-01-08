@@ -11,7 +11,6 @@ export async function getDailyExpensesForLastTwoWeeks({
   const now = DateTime.local();
   const startOfTwoWeeksAgo = now.minus({ weeks: 2 }).startOf("day").toJSDate();
 
-  // Use raw SQL to group by day (ignoring time)
   const expenses = await prisma.$queryRaw<{ day: Date; amount: number }[]>`
     SELECT
       DATE("transactionCreatedAt") AS day,
@@ -29,7 +28,6 @@ export async function getDailyExpensesForLastTwoWeeks({
       day ASC;
   `;
 
-  // Format the result for charting
   return expenses.map((expense) => ({
     date: DateTime.fromJSDate(expense.day).toFormat("yyyy-MM-dd"),
     amount: Number(expense.amount),
@@ -57,6 +55,7 @@ export async function getMonthlyExpensesForLastSixMonths({
       "userId" = ${userId}
       AND "type" = 'EXPENSE'
       AND "transactionCreatedAt" >= ${startOfSixMonthsAgo}
+      -- this prevents internal transfers between accounts to be counted as expenses
       AND description NOT LIKE 'Transfer to%'
     GROUP BY
       DATE_TRUNC('month', "transactionCreatedAt")
@@ -64,7 +63,7 @@ export async function getMonthlyExpensesForLastSixMonths({
       month ASC;
   `;
 
-  // Fill missing months with zero
+  // Fill missing months with zero so months always show even if they have no expenses
   const sixMonths = Array.from({ length: 6 }).map((_, i) =>
     now.minus({ months: i }).startOf("month"),
   );
