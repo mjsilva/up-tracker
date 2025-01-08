@@ -30,6 +30,7 @@ import { PaginationData } from "@/lib/types";
 import { syncTransactions } from "@/app/(sidebar)/transactions/actionts";
 import { toast } from "sonner";
 import { TransactionIcon } from "@/app/(sidebar)/transactions/_components/transaction-icon";
+import { useSearchParams } from "next/navigation";
 
 const categories = [
   "Food",
@@ -48,7 +49,7 @@ export function Transactions({
   transactions: Transaction[];
   paginationData: PaginationData;
 }) {
-  const [searchTerm, setSearchTerm] = useState("");
+  const searchParams = useSearchParams();
   const [categoryFilter, setCategoryFilter] = useState("all");
 
   async function handleSyncTransactions() {
@@ -68,12 +69,22 @@ export function Transactions({
 
       <div className="flex justify-between">
         <div className={"flex flex-col gap-4 sm:flex-row"}>
-          <Input
-            placeholder="Search transactions..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-96"
-          />
+          <form method={"get"}>
+            <Input
+              placeholder="Search transactions..."
+              defaultValue={searchParams.get("search") || ""}
+              onChange={(e) => {
+                if (!e.target.value) {
+                  const form = e.target.form;
+                  if (form) {
+                    form.submit();
+                  }
+                }
+              }}
+              className="w-96"
+              name={"search"}
+            />
+          </form>
           <Select value={categoryFilter} onValueChange={setCategoryFilter}>
             <SelectTrigger className="max-w-[180px]">
               <SelectValue placeholder="Filter by category" />

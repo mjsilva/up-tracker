@@ -7,7 +7,7 @@ import { Prisma } from "@prisma/client";
 async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; page_size?: string }>;
+  searchParams: Promise<{ page?: string; page_size?: string; search?: string }>;
 }) {
   const user = await currentUserServer();
 
@@ -15,6 +15,7 @@ async function Page({
   const pageSize = parseInt((await searchParams)?.page_size || "20", 10);
 
   const where = {
+    description: { contains: (await searchParams).search, mode: "insensitive" },
     NOT: { description: "Round Up" },
     userId: user.id,
   } satisfies Prisma.TransactionWhereInput;
