@@ -19,7 +19,9 @@ export default function Layout({ children }: PropsWithChildren) {
               <UserButton />
             </div>
           </header>
-          <main className="flex-1 overflow-y-auto p-6">{children}</main>
+          <main className="flex flex-1 justify-center overflow-y-auto p-6">
+            <div className={"w-full max-w-screen-2xl"}>{children}</div>
+          </main>
         </div>
       </SidebarProvider>
     </>

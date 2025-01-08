@@ -5,7 +5,7 @@ import { formatToCurrencyFromCents } from "@/lib/utils";
 import { ExpensesChart } from "@/app/(sidebar)/(dashboard)/_components/expenses-chart";
 import {
   getDailyExpensesForLastTwoWeeks,
-  getMonthlyExpensesForLastYear,
+  getMonthlyExpensesForLastSixMonths,
 } from "@/lib/services/transaction-service";
 
 export default async function Home() {
@@ -61,7 +61,7 @@ export default async function Home() {
     userId: user.id,
   });
 
-  const monthlyExpenses = await getMonthlyExpensesForLastYear({
+  const monthlyExpenses = await getMonthlyExpensesForLastSixMonths({
     userId: user.id,
   });
 

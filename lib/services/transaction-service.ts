@@ -36,13 +36,16 @@ export async function getDailyExpensesForLastTwoWeeks({
   }));
 }
 
-export async function getMonthlyExpensesForLastYear({
+export async function getMonthlyExpensesForLastSixMonths({
   userId,
 }: {
   userId: string;
 }) {
   const now = DateTime.local();
-  const startOfLastYear = now.minus({ months: 12 }).startOf("month").toJSDate();
+  const startOfSixMonthsAgo = now
+    .minus({ months: 6 })
+    .startOf("month")
+    .toJSDate();
 
   const expenses = await prisma.$queryRaw<{ month: Date; amount: number }[]>`
     SELECT
@@ -53,18 +56,30 @@ export async function getMonthlyExpensesForLastYear({
     WHERE
       "userId" = ${userId}
       AND "type" = 'EXPENSE'
-      AND "transactionCreatedAt" >= ${startOfLastYear}
-      -- this removes internal transfers, but there must be a better way to do this         
-      AND description NOT LIKE 'Transfer to%' 
+      AND "transactionCreatedAt" >= ${startOfSixMonthsAgo}
+      AND description NOT LIKE 'Transfer to%'
     GROUP BY
       DATE_TRUNC('month', "transactionCreatedAt")
     ORDER BY
       month ASC;
   `;
 
-  // Format the result for charting
-  return expenses.map((expense) => ({
-    date: DateTime.fromJSDate(expense.month).toFormat("yyyy-MM-01"),
-    amount: Number(expense.amount),
-  }));
+  // Fill missing months with zero
+  const sixMonths = Array.from({ length: 6 }).map((_, i) =>
+    now.minus({ months: i }).startOf("month"),
+  );
+
+  const expensesMap = new Map(
+    expenses.map((e) => [
+      DateTime.fromJSDate(e.month).toFormat("yyyy-MM"),
+      e.amount,
+    ]),
+  );
+
+  return sixMonths
+    .map((date) => ({
+      date: date.toFormat("yyyy-MM-01"),
+      amount: Number(expensesMap.get(date.toFormat("yyyy-MM"))) || 0,
+    }))
+    .reverse();
 }
