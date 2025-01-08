@@ -71,6 +71,7 @@ export function Transactions({
         <div className={"flex flex-col gap-4 sm:flex-row"}>
           <form method={"get"}>
             <Input
+              autoFocus
               placeholder="Search transactions..."
               defaultValue={searchParams.get("search") || ""}
               onChange={(e) => {
