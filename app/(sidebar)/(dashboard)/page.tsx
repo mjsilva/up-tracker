@@ -2,6 +2,8 @@ import prisma from "@/lib/db";
 import { currentUserServer } from "@/lib/services/user-service";
 import { DateTime } from "luxon";
 import { formatToCurrencyFromCents } from "@/lib/utils";
+import { DailyExpensesChart } from "@/app/(sidebar)/(dashboard)/_components/daily-expenses-chart";
+import { getDailyExpensesForLastTwoWeeks } from "@/lib/services/transaction-service";
 
 export default async function Home() {
   const user = await currentUserServer();
@@ -13,7 +15,7 @@ export default async function Home() {
   const startOfMonth = now.startOf("month").toJSDate();
   const startOfYear = now.startOf("year").toJSDate();
 
-  const dailyExpenses = await prisma.transaction.aggregate({
+  const dayExpenses = await prisma.transaction.aggregate({
     _sum: {
       amountValueInCents: true,
     },
@@ -26,7 +28,7 @@ export default async function Home() {
     },
   });
 
-  const monthlyExpenses = await prisma.transaction.aggregate({
+  const monthExpenses = await prisma.transaction.aggregate({
     _sum: {
       amountValueInCents: true,
     },
@@ -39,7 +41,7 @@ export default async function Home() {
     },
   });
 
-  const yearlyExpenses = await prisma.transaction.aggregate({
+  const yearExpenses = await prisma.transaction.aggregate({
     _sum: {
       amountValueInCents: true,
     },
@@ -52,6 +54,10 @@ export default async function Home() {
     },
   });
 
+  const dailyExpenses = await getDailyExpensesForLastTwoWeeks({
+    userId: user.id,
+  });
+
   return (
     <div className="grid gap-6">
       <section>
@@ -60,26 +66,25 @@ export default async function Home() {
           <div className="rounded-lg bg-card p-6 text-card-foreground shadow">
             <h3 className="mb-2 font-medium">Today&#39;s Expenses</h3>
             <p className="text-3xl font-bold">
-              {formatToCurrencyFromCents(dailyExpenses._sum.amountValueInCents)}
+              {formatToCurrencyFromCents(dayExpenses._sum.amountValueInCents)}
             </p>
           </div>
           <div className="rounded-lg bg-card p-6 text-card-foreground shadow">
             <h3 className="mb-2 font-medium">This Month</h3>
             <p className="text-3xl font-bold">
-              {formatToCurrencyFromCents(
-                monthlyExpenses._sum.amountValueInCents,
-              )}
+              {formatToCurrencyFromCents(monthExpenses._sum.amountValueInCents)}
             </p>
           </div>
           <div className="rounded-lg bg-card p-6 text-card-foreground shadow">
             <h3 className="mb-2 font-medium">This Year</h3>
             <p className="text-3xl font-bold">
-              {formatToCurrencyFromCents(
-                yearlyExpenses._sum.amountValueInCents,
-              )}
+              {formatToCurrencyFromCents(yearExpenses._sum.amountValueInCents)}
             </p>
           </div>
         </div>
+      </section>
+      <section>
+        <DailyExpensesChart data={dailyExpenses} />
       </section>
       <section>
         <h2 className="mb-4 text-2xl font-semibold">Recent Transactions</h2>

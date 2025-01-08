@@ -5,13 +5,25 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+const LOCALE = "en-AU";
+
+function formatCurrency(value: number, currency: string): string {
+  return new Intl.NumberFormat(LOCALE, {
+    style: "currency",
+    currency,
+  }).format(value);
+}
+
 export function formatToCurrencyFromCents(value: unknown, currency = "AUD") {
   if (typeof value !== "number") {
-    return;
+    return "";
   }
+  return formatCurrency(value / 100, currency);
+}
 
-  return new Intl.NumberFormat("en-AU", {
-    style: "currency",
-    currency: currency,
-  }).format(value / 100);
+export function formatToCurrency(value: unknown, currency = "AUD") {
+  if (typeof value !== "number") {
+    return "";
+  }
+  return formatCurrency(value, currency);
 }
