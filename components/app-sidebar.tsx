@@ -1,8 +1,6 @@
 import {
-  ArrowBigUp,
   ArrowBigUpIcon,
   ArrowLeftRight,
-  ArrowUp,
   LayoutDashboard,
   Menu,
   Settings,
@@ -51,8 +49,9 @@ export function AppSidebar() {
     <>
       <Sidebar>
         <SidebarHeader className="p-4">
-          <h2 className="flex items-center gap-2 text-2xl font-bold">
-            <ArrowBigUpIcon size={40} /> Up Tracker
+          <h2 className="flex items-center gap-1 text-2xl font-bold">
+            <ArrowBigUpIcon size={30} className={"fill-orange-400"} /> UP
+            tracker
           </h2>
         </SidebarHeader>
         <SidebarContent>

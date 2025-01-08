@@ -1,5 +1,9 @@
 import { inngest } from "./client";
-import { fetchTransactions, saveTransactionsToDB } from "@/lib/services/upbank";
+import {
+  fetchTransactions,
+  fetchTransactionsPartial,
+  saveTransactionsToDB,
+} from "@/lib/services/upbank";
 
 export const initialTransactionsSync = inngest.createFunction(
   { id: "onboarding-transactions-sync" },
@@ -16,7 +20,7 @@ export const initialTransactionsSync = inngest.createFunction(
     // Enqueue next page if necessary
     if (transactions.links.next) {
       await step.sendEvent("onboarding-transactions-sync-next-page", {
-        name: "onboarding/transactions-sync-next-page",
+        name: "transactions/sync-next-page",
         data: { userId, nextLink: transactions.links.next },
       });
     }
@@ -24,8 +28,8 @@ export const initialTransactionsSync = inngest.createFunction(
 );
 
 export const initialTransactionsSyncNextPage = inngest.createFunction(
-  { id: "onboarding-transactions-sync-next-page" },
-  { event: "onboarding/transactions-sync-next-page" },
+  { id: "transactions-sync-next-page" },
+  { event: "transactions/sync-next-page" },
   async ({ event, step }) => {
     const { userId, nextLink } = event.data;
     if (!userId || !nextLink) throw new Error("userId or nextLink is missing");
@@ -38,10 +42,38 @@ export const initialTransactionsSyncNextPage = inngest.createFunction(
 
     // Enqueue next page if necessary
     if (transactions.links.next) {
-      await step.sendEvent("onboarding-transactions-sync-next-page", {
-        name: "onboarding/transactions-sync-next-page",
+      await step.sendEvent("transactions-sync-next-page", {
+        name: "transactions/sync-next-page",
         data: { userId, nextLink: transactions.links.next },
       });
     }
   },
 );
+
+export const partialTransactionsSync = inngest.createFunction(
+  { id: "transactions-partial-sync" },
+  { event: "transactions/partial-sync" },
+  async ({ event, step }) => {
+    const { userId } = event.data;
+
+    // Fetch next page
+    const transactions = await fetchTransactionsPartial({ userId });
+    await step.run("save-next-page", async () => {
+      await saveTransactionsToDB({ transactions: transactions.data, userId });
+    });
+
+    // Enqueue next page if necessary
+    if (transactions.links.next) {
+      await step.sendEvent("transactions-sync-next-page", {
+        name: "transactions/sync-next-page",
+        data: { userId, nextLink: transactions.links.next, partial: true },
+      });
+    }
+  },
+);
+
+export const inngestFunctions = [
+  initialTransactionsSync,
+  partialTransactionsSync,
+  initialTransactionsSyncNextPage,
+];

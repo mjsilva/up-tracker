@@ -46,6 +46,63 @@ export async function fetchTransactions({
   return UpBankApiResponseSchema.parse(responseJson);
 }
 
+export async function fetchTransactionsPartial({ userId }: { userId: string }) {
+  const { value: upBankApiKeyEncrypted } =
+    await prisma.setting.findFirstOrThrow({
+      select: { value: true },
+      where: {
+        userId,
+        key: SettingKey.UP_BANK_API_KEY,
+      },
+    });
+
+  if (!upBankApiKeyEncrypted) {
+    throw new Error("up bank api key not found in user settings");
+  }
+
+  const upBankApiKey = decrypt(upBankApiKeyEncrypted);
+
+  const url = `${UPBANK_API_URL}?page[size]=100`;
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${upBankApiKey}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  const responseJson = await response.json();
+
+  const transactions = UpBankApiResponseSchema.parse(responseJson);
+
+  const lastTransaction = await prisma.transaction.findFirst({
+    where: { userId },
+    orderBy: {
+      createdAt: "desc",
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!lastTransaction) {
+    return transactions;
+  }
+
+  const lastSyncedTransactionId = lastTransaction.id;
+
+  for (const transaction of transactions.data) {
+    if (transaction.id === lastSyncedTransactionId) {
+      // set next link as null as we don't need to iterate further as we reached the last synced if
+      transactions.links.next = null;
+      break;
+    }
+  }
+
+  return transactions;
+}
+
 export async function saveTransactionsToDB({
   transactions,
   userId,

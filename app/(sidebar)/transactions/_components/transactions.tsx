@@ -23,10 +23,12 @@ import { Transaction } from "@prisma/client";
 import { DateTime } from "luxon";
 import { formatToCurrencyFromCents } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { EditIcon, EyeIcon } from "lucide-react";
+import { EditIcon, EyeIcon, RefreshCcwIcon } from "lucide-react";
 import { startCase } from "lodash";
 import { Pagination } from "@/app/(sidebar)/transactions/_components/pagination";
 import { PaginationData } from "@/lib/types";
+import { syncTransactions } from "@/app/(sidebar)/transactions/actionts";
+import { toast } from "sonner";
 
 const categories = [
   "Food",
@@ -48,9 +50,20 @@ export function Transactions({
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
 
+  async function handleSyncTransactions() {
+    toast("Transactions are now syncing, refresh in a bit");
+    await syncTransactions();
+  }
+
   return (
     <div className="flex flex-col space-y-4">
-      <h1 className="text-2xl font-bold">Transactions</h1>
+      <div className={"flex justify-between"}>
+        <h1 className="text-2xl font-bold">Transactions</h1>
+        <Button variant={"outline"} onClick={() => handleSyncTransactions()}>
+          <RefreshCcwIcon />
+          Sync
+        </Button>
+      </div>
 
       <div className="flex justify-between">
         <div className={"flex flex-col gap-4 sm:flex-row"}>

@@ -1,3 +1,5 @@
+"use server";
+
 import { currentUser } from "@clerk/nextjs/server";
 import prisma from "@/lib/db";
 
@@ -28,4 +30,14 @@ export async function currentUserServer() {
   }
 
   return dbUser;
+}
+
+export async function currentUserServerOrThrow() {
+  const user = await currentUserServer();
+
+  if (!user) {
+    throw new Error("user not found");
+  }
+
+  return user;
 }

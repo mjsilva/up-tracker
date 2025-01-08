@@ -1,17 +1,19 @@
-type TransactionsInitialSync = {
+type TransactionsSync = {
   data: {
     userId: string;
   };
 };
 
-type TransactionsInitialSyncNextPage = {
+type TransactionsSyncNextPage = {
   data: {
     userId: string;
     nextLink: string;
+    partial?: boolean;
   };
 };
 
 export type InngestEvents = {
-  "onboarding/transactions.sync": TransactionsInitialSync;
-  "onboarding/transactions-sync-next-page": TransactionsInitialSyncNextPage;
+  "onboarding/transactions.sync": TransactionsSync;
+  "transactions/sync-next-page": TransactionsSyncNextPage;
+  "transactions/partial-sync": TransactionsSync;
 };

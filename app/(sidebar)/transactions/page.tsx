@@ -5,11 +5,13 @@ import { currentUserServer } from "@/lib/services/user-service";
 import { Prisma } from "@prisma/client";
 
 async function Page({
-  searchParams,
+  searchParamsProps,
 }: {
-  searchParams: { page?: string; page_size?: string };
+  searchParamsProps: { page?: string; page_size?: string };
 }) {
   const user = await currentUserServer();
+
+  const searchParams = await searchParamsProps;
 
   const page = parseInt(searchParams?.page || "1", 10);
   const pageSize = parseInt(searchParams?.page_size || "20", 10);
