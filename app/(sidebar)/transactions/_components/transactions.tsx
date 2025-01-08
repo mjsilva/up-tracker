@@ -21,7 +21,7 @@ import {
 
 import { Transaction } from "@prisma/client";
 import { DateTime } from "luxon";
-import { formatToCurrencyFromCents } from "@/lib/utils";
+import { cn, formatToCurrencyFromCents } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { EditIcon, EyeIcon, RefreshCcwIcon } from "lucide-react";
 import { startCase } from "lodash";
@@ -29,6 +29,7 @@ import { Pagination } from "@/app/(sidebar)/transactions/_components/pagination"
 import { PaginationData } from "@/lib/types";
 import { syncTransactions } from "@/app/(sidebar)/transactions/actionts";
 import { toast } from "sonner";
+import { TransactionIcon } from "@/app/(sidebar)/transactions/_components/transaction-icon";
 
 const categories = [
   "Food",
@@ -96,9 +97,10 @@ export function Transactions({
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead></TableHead>
               <TableHead>Date</TableHead>
               <TableHead>Description</TableHead>
-              <TableHead className={"text-right"}>Amount</TableHead>
+              <TableHead className={"pr-5 text-right"}>Amount</TableHead>
               <TableHead>Category</TableHead>
               <TableHead></TableHead>
             </TableRow>
@@ -106,6 +108,11 @@ export function Transactions({
           <TableBody>
             {transactions.map((transaction) => (
               <TableRow key={transaction.id}>
+                <TableCell align={"center"}>
+                  <TransactionIcon
+                    cardPurchaseMethod={transaction.cardPurchaseMethod}
+                  />
+                </TableCell>
                 <TableCell>
                   {DateTime.fromJSDate(
                     transaction.transactionCreatedAt,
@@ -119,11 +126,12 @@ export function Transactions({
                 </TableCell>
                 <TableCell
                   align={"right"}
-                  className={
+                  className={cn(
+                    "pr-5",
                     transaction.amountValueInCents > 0
                       ? "text-green-600"
-                      : "text-red-600"
-                  }
+                      : "text-red-600",
+                  )}
                 >
                   {formatToCurrencyFromCents(transaction.amountValueInCents)}
                 </TableCell>
