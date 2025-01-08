@@ -13,37 +13,44 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { getDailyExpensesForLastTwoWeeks } from "@/lib/services/transaction-service";
-import { DateTime } from "luxon";
 import { formatToCurrency } from "@/lib/utils";
+import { DateTime } from "luxon";
 
-export function DailyExpensesChart({
+type ExpensesChartProps = {
+  data: { date: string; amount: number }[];
+  dateLuxonFormat: string;
+  title: string;
+  description: string;
+  chartColor?: string;
+};
+
+export function ExpensesChart({
   data,
-}: {
-  data: Awaited<ReturnType<typeof getDailyExpensesForLastTwoWeeks>>;
-}) {
+  dateLuxonFormat,
+  title,
+  description,
+  chartColor,
+}: ExpensesChartProps) {
   return (
-    <Card className="max-w-screen-sm">
+    <Card className="w-full">
       <CardHeader>
-        <CardTitle>Daily Expenses</CardTitle>
-        <CardDescription>
-          Your card tap spending over the last 2 weeks
-        </CardDescription>
+        <CardTitle>{title}</CardTitle>
+        <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer
           config={{
             amount: {
               label: "Amount",
-              color: "hsl(var(--chart-1))",
+              color: `hsl(var(${chartColor || "--chart-1"}))`,
             },
           }}
         >
           <BarChart accessibilityLayer data={data}>
             <XAxis
-              dataKey="day"
+              dataKey="date"
               tickFormatter={(value) =>
-                DateTime.fromSQL(value).toFormat("LLL d")
+                DateTime.fromSQL(value).toFormat(dateLuxonFormat)
               }
               tick={{ fontSize: 12 }}
               tickLine={false}

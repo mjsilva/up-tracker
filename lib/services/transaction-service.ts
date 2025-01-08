@@ -31,7 +31,40 @@ export async function getDailyExpensesForLastTwoWeeks({
 
   // Format the result for charting
   return expenses.map((expense) => ({
-    day: DateTime.fromJSDate(expense.day).toFormat("yyyy-MM-dd"),
+    date: DateTime.fromJSDate(expense.day).toFormat("yyyy-MM-dd"),
+    amount: Number(expense.amount),
+  }));
+}
+
+export async function getMonthlyExpensesForLastYear({
+  userId,
+}: {
+  userId: string;
+}) {
+  const now = DateTime.local();
+  const startOfLastYear = now.minus({ months: 12 }).startOf("month").toJSDate();
+
+  const expenses = await prisma.$queryRaw<{ month: Date; amount: number }[]>`
+    SELECT
+      DATE_TRUNC('month', "transactionCreatedAt") AS month,
+      SUM("amountValueInCents") / 100 * -1 AS amount
+    FROM
+      "Transaction"
+    WHERE
+      "userId" = ${userId}
+      AND "type" = 'EXPENSE'
+      AND "transactionCreatedAt" >= ${startOfLastYear}
+      -- this removes internal transfers, but there must be a better way to do this         
+      AND description NOT LIKE 'Transfer to%' 
+    GROUP BY
+      DATE_TRUNC('month', "transactionCreatedAt")
+    ORDER BY
+      month ASC;
+  `;
+
+  // Format the result for charting
+  return expenses.map((expense) => ({
+    date: DateTime.fromJSDate(expense.month).toFormat("yyyy-MM-01"),
     amount: Number(expense.amount),
   }));
 }

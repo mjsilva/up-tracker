@@ -2,8 +2,11 @@ import prisma from "@/lib/db";
 import { currentUserServer } from "@/lib/services/user-service";
 import { DateTime } from "luxon";
 import { formatToCurrencyFromCents } from "@/lib/utils";
-import { DailyExpensesChart } from "@/app/(sidebar)/(dashboard)/_components/daily-expenses-chart";
-import { getDailyExpensesForLastTwoWeeks } from "@/lib/services/transaction-service";
+import { ExpensesChart } from "@/app/(sidebar)/(dashboard)/_components/expenses-chart";
+import {
+  getDailyExpensesForLastTwoWeeks,
+  getMonthlyExpensesForLastYear,
+} from "@/lib/services/transaction-service";
 
 export default async function Home() {
   const user = await currentUserServer();
@@ -58,6 +61,10 @@ export default async function Home() {
     userId: user.id,
   });
 
+  const monthlyExpenses = await getMonthlyExpensesForLastYear({
+    userId: user.id,
+  });
+
   return (
     <div className="grid gap-6">
       <section>
@@ -83,8 +90,20 @@ export default async function Home() {
           </div>
         </div>
       </section>
-      <section>
-        <DailyExpensesChart data={dailyExpenses} />
+      <section className={"grid grid-cols-2 gap-4"}>
+        <ExpensesChart
+          data={dailyExpenses}
+          dateLuxonFormat={"LLL d"}
+          title={"Daily Expenses"}
+          description={"Your card tap spending over the last 2 weeks"}
+        />
+        <ExpensesChart
+          data={monthlyExpenses}
+          dateLuxonFormat={"LLL yy"}
+          title={"Monthly Expenses"}
+          description={"Your expenses over the last 12 months"}
+          chartColor={"--chart-2"}
+        />
       </section>
       <section>
         <h2 className="mb-4 text-2xl font-semibold">Recent Transactions</h2>
