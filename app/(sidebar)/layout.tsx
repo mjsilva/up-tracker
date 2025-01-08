@@ -20,7 +20,7 @@ export default function Layout({ children }: PropsWithChildren) {
             </div>
           </header>
           <main className="flex flex-1 justify-center overflow-y-auto p-6">
-            <div className={"w-full max-w-screen-2xl"}>{children}</div>
+            <div className={"w-full max-w-screen-xl"}>{children}</div>
           </main>
         </div>
       </SidebarProvider>
