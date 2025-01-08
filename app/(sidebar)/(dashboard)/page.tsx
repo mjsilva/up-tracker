@@ -28,6 +28,7 @@ export default async function Home() {
       transactionCreatedAt: {
         gte: startOfDay,
       },
+      NOT: { description: { contains: "Transfer to" } },
     },
   });
 
@@ -41,6 +42,7 @@ export default async function Home() {
       transactionCreatedAt: {
         gte: startOfMonth,
       },
+      NOT: { description: { contains: "Transfer to" } },
     },
   });
 
@@ -54,6 +56,7 @@ export default async function Home() {
       transactionCreatedAt: {
         gte: startOfYear,
       },
+      NOT: { description: { contains: "Transfer to" } },
     },
   });
 
@@ -90,7 +93,7 @@ export default async function Home() {
           </div>
         </div>
       </section>
-      <section className={"grid grid-cols-2 gap-4"}>
+      <section className={"grid grid-cols-1 gap-4 md:grid-cols-2"}>
         <ExpensesChart
           data={dailyExpenses}
           dateLuxonFormat={"LLL d"}
