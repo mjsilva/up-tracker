@@ -10,30 +10,28 @@ const isoDateSchema = z.string().transform((str) => {
   return date.toJSDate();
 });
 
-// Define the Money schema
 const MoneySchema = z.object({
   currencyCode: z.string(),
   value: z.string(),
   valueInBaseUnits: z.number(),
 });
 
-// Define the Transaction schema with nullish fields
 export const UpBankTransactionSchema = z.object({
   id: z.string(),
   attributes: z.object({
     status: z.string(),
-    rawText: z.string().nullish(), // rawText is nullish
+    rawText: z.string().nullish(),
     description: z.string(),
     message: z.string().nullish(),
     amount: MoneySchema,
     createdAt: isoDateSchema,
-    settledAt: isoDateSchema.nullish(), // Can be null if not settled
+    settledAt: isoDateSchema.nullish(),
     cardPurchaseMethod: z
       .object({
         method: z.string(),
         cardNumberSuffix: z.string().nullish(),
       })
-      .nullish(), // Nullable for non-card purchases
+      .nullish(),
   }),
   relationships: z.object({
     category: z.object({
@@ -41,20 +39,19 @@ export const UpBankTransactionSchema = z.object({
         .object({
           id: z.string(),
         })
-        .nullish(), // Category can be null
+        .nullish(),
     }),
     parentCategory: z.object({
       data: z
         .object({
           id: z.string(),
         })
-        .nullish(), // Parent category can be null
+        .nullish(),
     }),
   }),
-  foreignAmount: MoneySchema.nullish(), // Nullable if no foreign amount exists
+  foreignAmount: MoneySchema.nullish(),
 });
 
-// Define API response schema (for array of transactions)
 export const UpBankApiResponseSchema = z.object({
   data: z.array(UpBankTransactionSchema),
   links: z.object({

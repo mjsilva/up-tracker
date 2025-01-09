@@ -23,7 +23,6 @@ export async function currentUserServer() {
     dbUser = await prisma.user.create({
       data: {
         id: clerkUser.id,
-        name: clerkUser?.fullName ? clerkUser.fullName : undefined,
         email: clerkUser.emailAddresses[0].emailAddress,
       },
     });

@@ -45,11 +45,12 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  name  String?
   email String
 
   transactions Transaction[]
   settings     Setting[]
+
+  @@unique([email])
 }
 
 enum SettingKey {
