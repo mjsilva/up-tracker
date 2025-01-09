@@ -6,8 +6,8 @@ import {
 } from "@/lib/services/upbank";
 
 export const initialTransactionsSync = inngest.createFunction(
-  { id: "onboarding-transactions-sync" },
-  { event: "onboarding/transactions.sync" },
+  { id: "transactions-full-sync" },
+  { event: "transactions/full-sync" },
   async ({ event, step }) => {
     const { userId } = event.data;
     if (!userId) throw new Error("userId is missing");
@@ -19,7 +19,7 @@ export const initialTransactionsSync = inngest.createFunction(
 
     // Enqueue next page if necessary
     if (transactions.links.next) {
-      await step.sendEvent("onboarding-transactions-sync-next-page", {
+      await step.sendEvent("transactions-full-sync-next-page", {
         name: "transactions/sync-next-page",
         data: { userId, nextLink: transactions.links.next },
       });

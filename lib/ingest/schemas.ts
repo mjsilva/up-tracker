@@ -13,7 +13,7 @@ type TransactionsSyncNextPage = {
 };
 
 export type InngestEvents = {
-  "onboarding/transactions.sync": TransactionsSync;
+  "transactions/full-sync": TransactionsSync;
   "transactions/sync-next-page": TransactionsSyncNextPage;
   "transactions/partial-sync": TransactionsSync;
 };

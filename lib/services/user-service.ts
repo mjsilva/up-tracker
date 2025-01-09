@@ -16,10 +16,6 @@ export async function currentUserServer() {
   });
 
   if (!dbUser) {
-    if (!clerkUser.firstName || !clerkUser.lastName) {
-      throw new Error("user not found and clerk user is incomplete");
-    }
-
     dbUser = await prisma.user.create({
       data: {
         id: clerkUser.id,
