@@ -11,6 +11,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { HelpCircle, ExternalLink } from "lucide-react";
+import Link from "next/link";
 
 export function ApiKeyHelperModal() {
   const [open, setOpen] = useState(false);
@@ -32,25 +33,25 @@ export function ApiKeyHelperModal() {
         </DialogHeader>
         <div className="mt-4">
           <ol className="list-inside list-decimal space-y-2">
-            <li>Log in to your Up Bank account</li>
-            <li>Go to the &#34;Settings&#34; or &#34;Developer&#34; section</li>
-            <li>Look for an option to create or manage API keys</li>
-            <li>Generate a new API key</li>
             <li>
-              Copy the API key and paste it into the field in the settings
+              Go{" "}
+              <Link
+                target={"_blank"}
+                href={"https://api.up.com.au/getting_started"}
+                rel="noopener noreferrer"
+                className="inline-flex items-center text-primary hover:underline"
+              >
+                here
+                <ExternalLink className="ml-1 h-4 w-4" />
+              </Link>{" "}
+              and follow UP&apos;s instructions to get an API key
             </li>
+            <li>Copy the API key and paste it into the field bellow</li>
+            <li>Click save</li>
           </ol>
-          <p className="mt-4">
-            For more detailed instructions, please visit the{" "}
-            <a
-              href="https://developer.up.com.au/#getting-started"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center text-primary hover:underline"
-            >
-              Up Bank API documentation
-              <ExternalLink className="ml-1 h-4 w-4" />
-            </a>
+          <p className="mt-4 text-foreground">
+            Api key is a piece of text that should start with{" "}
+            <span className={"rounded-lg bg-orange-100 p-1"}>up:yeah:</span>
           </p>
         </div>
       </DialogContent>

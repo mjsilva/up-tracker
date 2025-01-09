@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { saveSettingsFormAction } from "@/app/(sidebar)/settings/actions";
-import { ApiKeyHelperModal } from "./api-key-helper-modal";
+import { ApiKeyHelperModal } from "@/components/api-key-helper-modal";
 import { Setting, SettingKey } from "@prisma/client";
 
 export function SettingsForm({

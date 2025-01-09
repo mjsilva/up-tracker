@@ -2,7 +2,7 @@
 
 import React, { useActionState } from "react";
 import { Label } from "@/components/ui/label";
-import { ApiKeyHelperModal } from "@/app/(sidebar)/settings/_components/api-key-helper-modal";
+import { ApiKeyHelperModal } from "@/components/api-key-helper-modal";
 import { Input } from "@/components/ui/input";
 import Form from "next/form";
 import { Button } from "@/components/ui/button";
