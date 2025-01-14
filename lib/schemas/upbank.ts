@@ -54,8 +54,10 @@ export const UpBankTransactionSchema = z.object({
 
 export const UpBankApiResponseSchema = z.object({
   data: z.array(UpBankTransactionSchema),
-  links: z.object({
-    prev: z.string().url().nullish(),
-    next: z.string().url().nullish(),
-  }),
+  links: z
+    .object({
+      prev: z.string().url().nullish(),
+      next: z.string().url().nullish(),
+    })
+    .nullish(),
 });

@@ -18,7 +18,7 @@ export const initialTransactionsSync = inngest.createFunction(
     });
 
     // Enqueue next page if necessary
-    if (transactions.links.next) {
+    if (transactions.links?.next) {
       await step.sendEvent("transactions-full-sync-next-page", {
         name: "transactions/sync-next-page",
         data: { userId, nextLink: transactions.links.next },
@@ -41,7 +41,7 @@ export const initialTransactionsSyncNextPage = inngest.createFunction(
     });
 
     // Enqueue next page if necessary
-    if (transactions.links.next) {
+    if (transactions.links?.next) {
       await step.sendEvent("transactions-sync-next-page", {
         name: "transactions/sync-next-page",
         data: { userId, nextLink: transactions.links.next },
@@ -63,7 +63,7 @@ export const partialTransactionsSync = inngest.createFunction(
     });
 
     // Enqueue next page if necessary
-    if (transactions.links.next) {
+    if (transactions.links?.next) {
       await step.sendEvent("transactions-sync-next-page", {
         name: "transactions/sync-next-page",
         data: { userId, nextLink: transactions.links.next, partial: true },

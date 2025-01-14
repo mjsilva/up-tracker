@@ -126,7 +126,10 @@ export async function fetchTransactionsPartial({ userId }: { userId: string }) {
   const lastSyncedTransactionId = lastTransaction.id;
 
   for (const transaction of transactions.data) {
-    if (transaction.id === lastSyncedTransactionId) {
+    if (
+      transaction.id === lastSyncedTransactionId &&
+      transactions.links?.next
+    ) {
       // set next link as null as we don't need to iterate further as we reached the last synced if
       transactions.links.next = null;
       break;
