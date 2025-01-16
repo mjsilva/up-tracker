@@ -55,6 +55,7 @@ model User {
 
 enum SettingKey {
   UP_BANK_API_KEY
+  UP_BANK_WEBHOOK_SECRET_KEY
 }
 
 model Setting {

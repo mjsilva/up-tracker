@@ -1,22 +1,22 @@
 import prisma from "@/lib/db";
-import { decrypt } from "@/lib/encryption";
+import { decrypt, encrypt } from "@/lib/encryption";
 import {
-  UpBankApiResponseSchema,
+  UpBankApiTransactionResponseSchema,
+  UpBankApiTransactionsResponseSchema,
+  UpBankApiWebhookCreationsResponseSchema,
+  UpBankApiWebhooksResponseSchema,
   UpBankTransactionSchema,
 } from "@/lib/schemas/upbank";
 import { z } from "zod";
-import { SettingKey, TransactionType } from "@prisma/client";
+import { Prisma, SettingKey, TransactionType } from "@prisma/client";
 import { backOff } from "exponential-backoff";
+import SettingUpdateInput = Prisma.SettingUpdateInput;
 
-const UPBANK_API_URL = "https://api.up.com.au/api/v1/transactions";
+const UPBANK_API_URL_BASE = "https://api.up.com.au/api/v1";
+const UPBANK_API_URL_TRANSACTIONS = `${UPBANK_API_URL_BASE}/transactions`;
+const UPBANK_API_URL_WEBHOOKS = `${UPBANK_API_URL_BASE}/webhooks`;
 
-export async function fetchTransactions({
-  nextLink,
-  userId,
-}: {
-  nextLink?: string;
-  userId: string;
-}) {
+async function getUpbankUserApiKey(userId: string) {
   const { value: upBankApiKeyEncrypted } =
     await prisma.setting.findFirstOrThrow({
       select: { value: true },
@@ -27,14 +27,26 @@ export async function fetchTransactions({
     });
 
   if (!upBankApiKeyEncrypted) {
-    throw new Error("Up Bank API key not found in user settings");
+    throw new Error("up bank api key not found in user settings");
   }
 
-  const upBankApiKey = decrypt(upBankApiKeyEncrypted);
-  const url = nextLink ? nextLink : `${UPBANK_API_URL}?page[size]=100`;
+  return decrypt(upBankApiKeyEncrypted);
+}
+
+export async function fetchTransactions({
+  nextLink,
+  userId,
+}: {
+  nextLink?: string;
+  userId: string;
+}) {
+  const upBankApiKey = await getUpbankUserApiKey(userId);
+  const url = nextLink
+    ? nextLink
+    : `${UPBANK_API_URL_TRANSACTIONS}?page[size]=100`;
 
   const fetchWithBackoff = async (): Promise<
-    z.infer<typeof UpBankApiResponseSchema>
+    z.infer<typeof UpBankApiTransactionsResponseSchema>
   > => {
     const response = await fetch(url, {
       method: "GET",
@@ -49,7 +61,7 @@ export async function fetchTransactions({
     }
 
     const responseJson = await response.json();
-    return UpBankApiResponseSchema.parse(responseJson);
+    return UpBankApiTransactionsResponseSchema.parse(responseJson);
   };
 
   try {
@@ -80,22 +92,9 @@ export async function fetchTransactions({
 }
 
 export async function fetchTransactionsPartial({ userId }: { userId: string }) {
-  const { value: upBankApiKeyEncrypted } =
-    await prisma.setting.findFirstOrThrow({
-      select: { value: true },
-      where: {
-        userId,
-        key: SettingKey.UP_BANK_API_KEY,
-      },
-    });
+  const upBankApiKey = await getUpbankUserApiKey(userId);
 
-  if (!upBankApiKeyEncrypted) {
-    throw new Error("up bank api key not found in user settings");
-  }
-
-  const upBankApiKey = decrypt(upBankApiKeyEncrypted);
-
-  const url = `${UPBANK_API_URL}?page[size]=100`;
+  const url = `${UPBANK_API_URL_TRANSACTIONS}?page[size]=100`;
 
   const response = await fetch(url, {
     method: "GET",
@@ -107,7 +106,7 @@ export async function fetchTransactionsPartial({ userId }: { userId: string }) {
 
   const responseJson = await response.json();
 
-  const transactions = UpBankApiResponseSchema.parse(responseJson);
+  const transactions = UpBankApiTransactionsResponseSchema.parse(responseJson);
 
   const lastTransaction = await prisma.transaction.findFirst({
     where: { userId },
@@ -137,6 +136,34 @@ export async function fetchTransactionsPartial({ userId }: { userId: string }) {
   }
 
   return transactions;
+}
+export async function fetchTransactionSingle({
+  userId,
+  transactionId,
+}: {
+  userId: string;
+  transactionId: string;
+}) {
+  const upBankApiKey = await getUpbankUserApiKey(userId);
+
+  // Construct the URL to fetch the single transaction
+  const url = `${UPBANK_API_URL_TRANSACTIONS}/${transactionId}`;
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${upBankApiKey}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch transaction: ${response.statusText}`);
+  }
+
+  const responseJson = await response.json();
+
+  return UpBankApiTransactionResponseSchema.parse(responseJson);
 }
 
 export async function saveTransactionsToDB({
@@ -194,4 +221,93 @@ export async function saveTransactionsToDB({
       },
     });
   }
+}
+
+export async function getWebhooks(userId: string) {
+  const upBankApiKey = await getUpbankUserApiKey(userId);
+
+  const response = await fetch(UPBANK_API_URL_WEBHOOKS, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${upBankApiKey}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`API request failed with status: ${response.status}`);
+  }
+
+  const responseJson = await response.json();
+
+  return UpBankApiWebhooksResponseSchema.parse(responseJson);
+}
+
+export async function createWebhook({
+  userId,
+  webhookUrl,
+  description,
+}: {
+  userId: string;
+  webhookUrl: string;
+  description?: string;
+}) {
+  const upBankApiKey = await getUpbankUserApiKey(userId);
+  console.log({ upBankApiKey });
+
+  const payload = {
+    data: {
+      attributes: {
+        url: webhookUrl,
+        ...(description && { description }),
+      },
+    },
+  };
+
+  const response = await fetch(UPBANK_API_URL_WEBHOOKS, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${upBankApiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await response.json();
+  console.log("Webhook created successfully:", data);
+
+  return UpBankApiWebhookCreationsResponseSchema.parse(data);
+}
+
+export async function createAndSaveWebhook(userId: string) {
+  const baseUrl = process.env.BASE_URL;
+  if (!baseUrl) {
+    throw new Error("BASE_URL not found");
+  }
+
+  const webhookUrl = `${baseUrl}/api/webhooks/upbank/${userId}`;
+
+  const webHookData = await createWebhook({
+    userId,
+    webhookUrl,
+    description: "UP Tracker webhook",
+  });
+
+  const commonData = {
+    key: SettingKey.UP_BANK_WEBHOOK_SECRET_KEY,
+    value: encrypt(webHookData.data.attributes.secretKey),
+  } satisfies SettingUpdateInput;
+
+  await prisma.setting.upsert({
+    where: {
+      userId_key: { userId, key: SettingKey.UP_BANK_WEBHOOK_SECRET_KEY },
+    },
+    create: {
+      userId,
+      ...commonData,
+    },
+    update: {
+      ...commonData,
+    },
+  });
 }

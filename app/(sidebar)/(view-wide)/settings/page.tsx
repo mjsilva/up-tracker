@@ -1,5 +1,5 @@
 import React from "react";
-import { SettingsForm } from "@/app/(sidebar)/settings/_components/settings-form";
+import { SettingsForm } from "@/app/(sidebar)/(view-wide)/settings/_components/settings-form";
 import { currentUserServer } from "@/lib/services/user-service";
 import prisma from "@/lib/db";
 

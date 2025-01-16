@@ -52,12 +52,81 @@ export const UpBankTransactionSchema = z.object({
   foreignAmount: MoneySchema.nullish(),
 });
 
-export const UpBankApiResponseSchema = z.object({
+export const UpBankApiTransactionsResponseSchema = z.object({
   data: z.array(UpBankTransactionSchema),
-  links: z
-    .object({
-      prev: z.string().url().nullish(),
-      next: z.string().url().nullish(),
-    })
-    .nullish(),
+  links: z.object({
+    prev: z.string().url().nullish(),
+    next: z.string().url().nullish(),
+  }),
+});
+
+export const UpBankApiTransactionResponseSchema = z.object({
+  data: UpBankTransactionSchema,
+});
+
+export const UpBankWebhookSchema = z.object({
+  id: z.string(),
+  attributes: z.object({
+    url: z.string(),
+    description: z.string().nullish(),
+    createdAt: z.string().nullish(),
+  }),
+});
+
+export const UpBankApiWebhookCreationsResponseSchema = z.object({
+  data: z.object({
+    id: z.string(),
+    attributes: z.object({
+      url: z.string(),
+      description: z.string().nullish(),
+      secretKey: z.string(),
+      createdAt: isoDateSchema,
+    }),
+  }),
+});
+
+export const UpBankApiWebhooksResponseSchema = z.object({
+  data: z.array(UpBankWebhookSchema),
+  links: z.object({
+    prev: z.string().url().nullish(),
+    next: z.string().url().nullish(),
+  }),
+});
+
+export const UpBankWebhookEventTypeSchema = z.enum([
+  "PING",
+  "TRANSACTION_CREATED",
+  "TRANSACTION_SETTLED",
+  "TRANSACTION_DELETED",
+]);
+
+export const UpBankWebhookPayloadSchema = z.object({
+  data: z.object({
+    id: z.string(),
+    attributes: z.object({
+      eventType: UpBankWebhookEventTypeSchema,
+      createdAt: isoDateSchema,
+    }),
+    relationships: z.object({
+      webhook: z.object({
+        data: z.object({
+          type: z.literal("webhooks"),
+          id: z.string(),
+        }),
+      }),
+      transaction: z
+        .object({
+          data: z.object({
+            type: z.literal("transactions"),
+            id: z.string(),
+          }),
+          links: z
+            .object({
+              related: z.string().url(),
+            })
+            .optional(),
+        })
+        .optional(),
+    }),
+  }),
 });

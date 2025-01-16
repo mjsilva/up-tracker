@@ -2,7 +2,7 @@ import prisma from "@/lib/db";
 import { currentUserServer } from "@/lib/services/user-service";
 import { DateTime } from "luxon";
 import { formatToCurrencyFromCents } from "@/lib/utils";
-import { ExpensesChart } from "@/app/(sidebar)/(dashboard)/_components/expenses-chart";
+import { ExpensesChart } from "./_components/expenses-chart";
 import {
   getDailyExpensesForLastTwoWeeks,
   getMonthlyExpensesForLastSixMonths,

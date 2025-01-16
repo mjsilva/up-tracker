@@ -1,6 +1,7 @@
 import { inngest } from "./client";
 import {
   fetchTransactions,
+  fetchTransactionSingle,
   fetchTransactionsPartial,
   saveTransactionsToDB,
 } from "@/lib/services/upbank";
@@ -72,8 +73,26 @@ export const partialTransactionsSync = inngest.createFunction(
   },
 );
 
+export const singleTransactionsSync = inngest.createFunction(
+  { id: "transactions-single-sync" },
+  { event: "transactions/single-sync" },
+  async ({ event, step }) => {
+    const { userId, transactionId } = event.data;
+
+    const transactions = await fetchTransactionSingle({
+      userId,
+      transactionId,
+    });
+
+    await step.run("save-next-page", async () => {
+      await saveTransactionsToDB({ transactions: [transactions.data], userId });
+    });
+  },
+);
+
 export const inngestFunctions = [
   initialTransactionsSync,
   partialTransactionsSync,
   initialTransactionsSyncNextPage,
+  singleTransactionsSync,
 ];

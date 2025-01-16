@@ -12,8 +12,16 @@ type TransactionsSyncNextPage = {
   };
 };
 
+type TransactionSingleSync = {
+  data: {
+    userId: string;
+    transactionId: string;
+  };
+};
+
 export type InngestEvents = {
   "transactions/full-sync": TransactionsSync;
   "transactions/sync-next-page": TransactionsSyncNextPage;
   "transactions/partial-sync": TransactionsSync;
+  "transactions/single-sync": TransactionSingleSync;
 };

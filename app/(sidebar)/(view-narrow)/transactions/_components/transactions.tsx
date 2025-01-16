@@ -25,12 +25,12 @@ import { cn, formatToCurrencyFromCents } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { EditIcon, EyeIcon, RefreshCcwIcon } from "lucide-react";
 import { startCase } from "lodash";
-import { Pagination } from "@/app/(sidebar)/transactions/_components/pagination";
 import { PaginationData } from "@/lib/types";
-import { syncTransactions } from "@/app/(sidebar)/transactions/actionts";
 import { toast } from "sonner";
-import { TransactionIcon } from "@/app/(sidebar)/transactions/_components/transaction-icon";
 import { useSearchParams } from "next/navigation";
+import { Pagination } from "./pagination";
+import { syncTransactions } from "../actionts";
+import { TransactionIcon } from "./transaction-icon";
 
 const categories = [
   "Food",

@@ -3,12 +3,13 @@
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import prisma from "@/lib/db";
-import { currentUserServer } from "@/lib/services/user-service";
+import { currentUserServerOrThrow } from "@/lib/services/user-service";
 import { encrypt } from "@/lib/encryption";
 import { SettingKey } from "@prisma/client";
 import { FormActionFnReturnType } from "@/lib/types";
+import { createAndSaveWebhook } from "@/lib/services/upbank";
 
-export async function saveSettingsFormAction(
+export async function saveApiKeyFormAction(
   prevState: unknown,
   formData: FormData,
 ): FormActionFnReturnType {
@@ -27,11 +28,7 @@ export async function saveSettingsFormAction(
 
   const { apiKey } = validatedFields.data;
 
-  const user = await currentUserServer();
-
-  if (!user) {
-    throw new Error("user not found");
-  }
+  const user = await currentUserServerOrThrow();
 
   await prisma.setting.upsert({
     where: { userId_key: { userId: user.id, key: SettingKey.UP_BANK_API_KEY } },
@@ -50,4 +47,11 @@ export async function saveSettingsFormAction(
   return {
     isSuccess: true,
   };
+}
+
+export async function createWebhook() {
+  const user = await currentUserServerOrThrow();
+  await createAndSaveWebhook(user.id);
+
+  revalidatePath("/settings");
 }

@@ -1,8 +1,8 @@
 import React from "react";
-import Transactions from "@/app/(sidebar)/transactions/_components/transactions";
 import prisma from "@/lib/db";
 import { currentUserServer } from "@/lib/services/user-service";
 import { Prisma } from "@prisma/client";
+import Transactions from "./_components/transactions";
 
 async function Page({
   searchParams,
