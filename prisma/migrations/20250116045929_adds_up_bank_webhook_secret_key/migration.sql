@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "SettingKey" ADD VALUE 'UP_BANK_WEBHOOK_SECRET_KEY';
