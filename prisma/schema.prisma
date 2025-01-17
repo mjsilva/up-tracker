@@ -18,18 +18,23 @@ model Transaction {
   updatedAt DateTime @updatedAt
 
   // upbank fields
-  status               String
-  rawText              String?
-  description          String
-  message              String?
-  amountValueInCents   Int
-  amountCurrencyCode   String
-  cardPurchaseMethod   String?
-  cardNumberSuffix     String?
-  transactionCreatedAt DateTime
-  transactionSettledAt DateTime?
-  upCategory           String?
-  upParentCategory     String?
+  status                    String
+  rawText                   String?
+  description               String
+  message                   String?
+  amountValueInCents        Int
+  amountCurrencyCode        String
+  cardPurchaseMethod        String?
+  cardNumberSuffix          String?
+  transactionCreatedAt      DateTime
+  transactionSettledAt      DateTime?
+  upCategory                String?
+  upParentCategory          String?
+  // if its a transaction between user accounts
+  isTransferBetweenAccounts Boolean   @default(false)
+  // future proof so if we need a field normalised we don't need to do a full sync again
+  rawData                   Json?
+  // todo: add foreign transaction data
   // foreignAmountValueInCents Int?
   // foreignAmountValueInCents Int?
 

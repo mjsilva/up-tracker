@@ -11,6 +11,7 @@ import { z } from "zod";
 import { Prisma, SettingKey, TransactionType } from "@prisma/client";
 import { backOff } from "exponential-backoff";
 import SettingUpdateInput = Prisma.SettingUpdateInput;
+import TransactionUpdateInput = Prisma.TransactionUpdateInput;
 
 const UPBANK_API_URL_BASE = "https://api.up.com.au/api/v1";
 const UPBANK_API_URL_TRANSACTIONS = `${UPBANK_API_URL_BASE}/transactions`;
@@ -31,6 +32,26 @@ async function getUpbankUserApiKey(userId: string) {
   }
 
   return decrypt(upBankApiKeyEncrypted);
+}
+
+function appendRawDataToTransactions(responseJson: any) {
+  return {
+    ...responseJson,
+    data: responseJson.data.map((transaction: any) => ({
+      ...transaction,
+      rawData: transaction,
+    })),
+  };
+}
+
+function appendRawDataToTransaction(responseJson: any) {
+  return {
+    ...responseJson,
+    data: {
+      ...responseJson.data,
+      rawData: responseJson.data,
+    },
+  };
 }
 
 export async function fetchTransactions({
@@ -61,7 +82,11 @@ export async function fetchTransactions({
     }
 
     const responseJson = await response.json();
-    return UpBankApiTransactionsResponseSchema.parse(responseJson);
+
+    // Transform the parsed response to include rawData
+    const transformedData = appendRawDataToTransactions(responseJson);
+
+    return UpBankApiTransactionsResponseSchema.parse(transformedData);
   };
 
   try {
@@ -106,7 +131,11 @@ export async function fetchTransactionsPartial({ userId }: { userId: string }) {
 
   const responseJson = await response.json();
 
-  const transactions = UpBankApiTransactionsResponseSchema.parse(responseJson);
+  // Transform the parsed response to include rawData
+  const transformedData = appendRawDataToTransactions(responseJson);
+
+  const transactions =
+    UpBankApiTransactionsResponseSchema.parse(transformedData);
 
   const lastTransaction = await prisma.transaction.findFirst({
     where: { userId },
@@ -163,7 +192,10 @@ export async function fetchTransactionSingle({
 
   const responseJson = await response.json();
 
-  return UpBankApiTransactionResponseSchema.parse(responseJson);
+  // Transform the parsed response to include rawData
+  const transformedData = appendRawDataToTransaction(responseJson);
+
+  return UpBankApiTransactionResponseSchema.parse(transformedData);
 }
 
 export async function saveTransactionsToDB({
@@ -174,49 +206,33 @@ export async function saveTransactionsToDB({
   userId: string;
 }) {
   for (const tx of transactions) {
-    const {
-      id,
-      attributes: {
-        status,
-        rawText,
-        description,
-        message,
-        amount,
-        createdAt,
-        settledAt,
-        cardPurchaseMethod,
-      },
-      relationships: {
-        category: { data: category },
-        parentCategory: { data: parentCategory },
-      },
-    } = tx;
-
     const commonTransactionData = {
-      status,
-      rawText: rawText ?? null,
-      description,
-      message: message ?? null,
-      amountValueInCents: amount.valueInBaseUnits,
-      amountCurrencyCode: amount.currencyCode,
-      transactionCreatedAt: new Date(createdAt),
-      transactionSettledAt: settledAt ? new Date(settledAt) : null,
-      cardPurchaseMethod: cardPurchaseMethod?.method ?? null,
-      cardNumberSuffix: cardPurchaseMethod?.cardNumberSuffix ?? null,
-      upCategory: category?.id ?? null,
-      upParentCategory: parentCategory?.id ?? null,
+      status: tx.attributes.status,
+      rawText: tx.attributes.rawText,
+      description: tx.attributes.description,
+      message: tx.attributes.message,
+      amountValueInCents: tx.attributes.amount.valueInBaseUnits,
+      amountCurrencyCode: tx.attributes.amount.currencyCode,
+      transactionCreatedAt: tx.attributes.createdAt,
+      transactionSettledAt: tx.attributes?.settledAt,
+      cardPurchaseMethod: tx.attributes.cardPurchaseMethod?.method,
+      cardNumberSuffix: tx.attributes.cardPurchaseMethod?.cardNumberSuffix,
+      upCategory: tx.relationships.category.data?.id,
+      upParentCategory: tx.relationships.parentCategory.data?.id,
+      isTransferBetweenAccounts: !!tx.relationships.transferAccount.data?.id,
       type:
-        amount.valueInBaseUnits > 0
+        tx.attributes.amount.valueInBaseUnits > 0
           ? TransactionType.INCOME
           : TransactionType.EXPENSE,
-    };
+      rawData: tx.rawData,
+    } satisfies TransactionUpdateInput;
 
     await prisma.transaction.upsert({
-      where: { id },
+      where: { id: tx.id },
       update: commonTransactionData,
       create: {
         ...commonTransactionData,
-        id,
+        id: tx.id,
         userId,
       },
     });

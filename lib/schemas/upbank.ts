@@ -48,8 +48,16 @@ export const UpBankTransactionSchema = z.object({
         })
         .nullish(),
     }),
+    transferAccount: z.object({
+      data: z
+        .object({
+          id: z.string(),
+        })
+        .nullish(),
+    }),
   }),
   foreignAmount: MoneySchema.nullish(),
+  rawData: z.any().optional(),
 });
 
 export const UpBankApiTransactionsResponseSchema = z.object({
