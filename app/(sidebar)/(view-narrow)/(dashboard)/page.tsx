@@ -28,7 +28,7 @@ export default async function Home() {
       transactionCreatedAt: {
         gte: startOfDay,
       },
-      NOT: { description: { contains: "Transfer to" } },
+      isTransferBetweenAccounts: false,
     },
   });
 
@@ -42,7 +42,7 @@ export default async function Home() {
       transactionCreatedAt: {
         gte: startOfMonth,
       },
-      NOT: { description: { contains: "Transfer to" } },
+      isTransferBetweenAccounts: false,
     },
   });
 
@@ -56,7 +56,7 @@ export default async function Home() {
       transactionCreatedAt: {
         gte: startOfYear,
       },
-      NOT: { description: { contains: "Transfer to" } },
+      isTransferBetweenAccounts: false,
     },
   });
 

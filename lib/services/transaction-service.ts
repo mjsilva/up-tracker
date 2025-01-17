@@ -56,7 +56,7 @@ export async function getMonthlyExpensesForLastSixMonths({
       AND "type" = 'EXPENSE'
       AND "transactionCreatedAt" >= ${startOfSixMonthsAgo}
       -- this prevents internal transfers between accounts to be counted as expenses
-      AND description NOT LIKE 'Transfer to%'
+      AND "isTransferBetweenAccounts" = FALSE
     GROUP BY
       DATE_TRUNC('month', "transactionCreatedAt")
     ORDER BY
