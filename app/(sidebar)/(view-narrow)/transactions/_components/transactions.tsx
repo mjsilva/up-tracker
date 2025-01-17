@@ -75,7 +75,7 @@ export function Transactions({
               placeholder="Search transactions..."
               defaultValue={searchParams.get("search") || ""}
               onChange={(e) => {
-                if (!e.target.value) {
+                if (!e.target.value && searchParams.get("search")) {
                   const form = e.target.form;
                   if (form) {
                     form.submit();
@@ -148,9 +148,14 @@ export function Transactions({
                   {formatToCurrencyFromCents(transaction.amountValueInCents)}
                 </TableCell>
                 <TableCell>
-                  {startCase(
-                    transaction.upParentCategory?.replaceAll("-", " "),
-                  )}
+                  <p>
+                    {startCase(
+                      transaction.upParentCategory?.replaceAll("-", " "),
+                    )}
+                  </p>
+                  <p className={"text-muted-foreground"}>
+                    {startCase(transaction.upCategory?.replaceAll("-", " "))}
+                  </p>
                 </TableCell>
                 <TableCell align={"right"}>
                   <Button variant={"ghost"}>
