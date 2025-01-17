@@ -16,7 +16,7 @@ async function Page({
 
   const where = {
     description: { contains: (await searchParams).search, mode: "insensitive" },
-    NOT: { description: "Round Up" },
+    isTransferBetweenAccounts: false,
     userId: user.id,
   } satisfies Prisma.TransactionWhereInput;
 
