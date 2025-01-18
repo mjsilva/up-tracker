@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import {
   Table,
   TableBody,
@@ -50,12 +50,27 @@ export function Transactions({
   paginationData: PaginationData;
 }) {
   const searchParams = useSearchParams();
+  const searchQuery = searchParams.get("search") || "";
   const [categoryFilter, setCategoryFilter] = useState("all");
 
   async function handleSyncTransactions() {
     toast("Transactions are now syncing, refresh in a bit");
     await syncTransactions();
   }
+
+  const transactionsByDate = transactions.reduce<
+    Record<string, { transactions: Transaction[]; total: number }>
+  >((acc, transaction) => {
+    const dateKey = DateTime.fromJSDate(
+      new Date(transaction.transactionCreatedAt),
+    ).toFormat("MMM dd, yyyy");
+    if (!acc[dateKey]) {
+      acc[dateKey] = { transactions: [], total: 0 };
+    }
+    acc[dateKey].transactions.push(transaction);
+    acc[dateKey].total += transaction.amountValueInCents;
+    return acc;
+  }, {});
 
   return (
     <div className="flex flex-col space-y-4">
@@ -73,7 +88,7 @@ export function Transactions({
             <Input
               autoFocus
               placeholder="Search transactions..."
-              defaultValue={searchParams.get("search") || ""}
+              defaultValue={searchQuery}
               onChange={(e) => {
                 if (!e.target.value && searchParams.get("search")) {
                   const form = e.target.form;
@@ -118,55 +133,81 @@ export function Transactions({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {transactions.map((transaction) => (
-              <TableRow key={transaction.id}>
-                <TableCell align={"center"}>
-                  <TransactionIcon
-                    cardPurchaseMethod={transaction.cardPurchaseMethod}
-                  />
-                </TableCell>
-                <TableCell>
-                  {DateTime.fromJSDate(
-                    transaction.transactionCreatedAt,
-                  ).toLocaleString(DateTime.DATETIME_MED)}
-                </TableCell>
-                <TableCell>
-                  {transaction.description}
-                  {transaction?.message && (
-                    <span> ({transaction?.message})</span>
+            {Object.entries(transactionsByDate).map(
+              ([date, { transactions, total }]) => (
+                <Fragment key={date}>
+                  {!searchQuery && (
+                    <TableRow>
+                      <TableCell
+                        colSpan={3}
+                        className={"text-left text-muted-foreground"}
+                      >
+                        {date}
+                      </TableCell>
+                      <TableCell
+                        colSpan={3}
+                        className={"text-right text-muted-foreground"}
+                      >
+                        {formatToCurrencyFromCents(total)}
+                      </TableCell>
+                    </TableRow>
                   )}
-                </TableCell>
-                <TableCell
-                  align={"right"}
-                  className={cn(
-                    "pr-5",
-                    transaction.amountValueInCents > 0
-                      ? "text-green-600"
-                      : "text-red-600",
-                  )}
-                >
-                  {formatToCurrencyFromCents(transaction.amountValueInCents)}
-                </TableCell>
-                <TableCell>
-                  <p>
-                    {startCase(
-                      transaction.upParentCategory?.replaceAll("-", " "),
-                    )}
-                  </p>
-                  <p className={"text-muted-foreground"}>
-                    {startCase(transaction.upCategory?.replaceAll("-", " "))}
-                  </p>
-                </TableCell>
-                <TableCell align={"right"}>
-                  <Button variant={"ghost"}>
-                    <EditIcon />
-                  </Button>
-                  <Button variant={"ghost"}>
-                    <EyeIcon />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
+                  {transactions.map((transaction) => (
+                    <TableRow key={transaction.id}>
+                      <TableCell align={"center"}>
+                        <TransactionIcon
+                          cardPurchaseMethod={transaction.cardPurchaseMethod}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        {DateTime.fromJSDate(
+                          transaction.transactionCreatedAt,
+                        ).toLocaleString(DateTime.DATETIME_MED)}
+                      </TableCell>
+                      <TableCell>
+                        {transaction.description}
+                        {transaction?.message && (
+                          <span> ({transaction?.message})</span>
+                        )}
+                      </TableCell>
+                      <TableCell
+                        align={"right"}
+                        className={cn(
+                          "pr-5",
+                          transaction.amountValueInCents > 0
+                            ? "text-green-600"
+                            : "text-red-600",
+                        )}
+                      >
+                        {formatToCurrencyFromCents(
+                          transaction.amountValueInCents,
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <p>
+                          {startCase(
+                            transaction.upParentCategory?.replaceAll("-", " "),
+                          )}
+                        </p>
+                        <p className={"text-muted-foreground"}>
+                          {startCase(
+                            transaction.upCategory?.replaceAll("-", " "),
+                          )}
+                        </p>
+                      </TableCell>
+                      <TableCell align={"right"}>
+                        <Button variant={"ghost"}>
+                          <EditIcon />
+                        </Button>
+                        <Button variant={"ghost"}>
+                          <EyeIcon />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </Fragment>
+              ),
+            )}
           </TableBody>
         </Table>
       </div>
