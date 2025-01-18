@@ -142,7 +142,7 @@ export function Transactions({
                         colSpan={3}
                         className={"text-left text-muted-foreground"}
                       >
-                        {date}
+                        {date}・{transactions.length} transactions
                       </TableCell>
                       <TableCell
                         colSpan={3}
