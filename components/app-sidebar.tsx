@@ -1,5 +1,5 @@
 import {
-  ArrowBigUpIcon,
+  ArrowBigUpDashIcon,
   ArrowLeftRight,
   LayoutDashboard,
   Menu,
@@ -19,6 +19,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Button } from "./ui/button";
+import Link from "next/link";
 
 // Menu items.
 const items = [
@@ -49,10 +50,15 @@ export function AppSidebar() {
     <>
       <Sidebar>
         <SidebarHeader className="p-4">
-          <h2 className="flex items-center gap-1 text-2xl font-bold">
-            <ArrowBigUpIcon size={30} className={"fill-orange-400"} /> UP
-            tracker
-          </h2>
+          <Link href={"/"} className="group/logo">
+            <h2 className="flex items-center text-2xl font-bold tracking-tight">
+              <ArrowBigUpDashIcon
+                size={60}
+                className="fill-orange-400 stroke-1 transition-transform duration-500 ease-in-out motion-safe:group-hover/logo:-translate-y-1"
+              />
+              <span className="-ml-1">tracker</span>
+            </h2>
+          </Link>
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
