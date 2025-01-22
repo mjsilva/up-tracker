@@ -1,6 +1,6 @@
 import {
-  ArrowBigUpDashIcon,
   ArrowLeftRight,
+  BarChart2,
   LayoutDashboard,
   Menu,
   Settings,
@@ -44,14 +44,11 @@ export function AppSidebar() {
     <>
       <Sidebar>
         <SidebarHeader className="p-4">
-          <Link href={"/dashboard"} className="group/logo">
-            <h2 className="flex items-center text-2xl font-bold tracking-tight">
-              <ArrowBigUpDashIcon
-                size={60}
-                className="fill-orange-400 stroke-1 transition-transform duration-500 ease-in-out motion-safe:group-hover/logo:-translate-y-1"
-              />
-              <span className="-ml-1">tracker</span>
-            </h2>
+          <Link className="flex items-center" href="/dashboard">
+            <BarChart2 className="h-6 w-6 text-orange-600" />
+            <span className="ml-2 text-2xl font-bold text-gray-900">
+              UP Tracker
+            </span>
           </Link>
         </SidebarHeader>
         <SidebarContent>
