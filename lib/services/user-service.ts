@@ -7,7 +7,7 @@ export async function currentUserServer() {
   const clerkUser = await currentUser();
 
   if (!clerkUser) {
-    throw new Error("User not found");
+    return null;
   }
 
   let dbUser;
