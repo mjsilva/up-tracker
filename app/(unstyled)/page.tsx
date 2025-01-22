@@ -63,14 +63,14 @@ async function LandingPage() {
                   or use our cloud solution.
                 </p>
               </div>
-              <div className="space-x-4">
+              <div className="flex w-full flex-col justify-center gap-2 sm:flex-row">
                 <Button
-                  className="w-52 bg-orange-600 hover:bg-orange-600/90"
+                  className="w-full bg-orange-600 hover:bg-orange-600/90 sm:w-52"
                   asChild
                 >
                   <Link href="/sign-up">Cloud sign up</Link>
                 </Button>
-                <Button variant="outline" asChild className={"w-52"}>
+                <Button variant="outline" asChild className={"w-full sm:w-52"}>
                   <Link href="https://github.com/mjsilva/up-tracker">
                     <Github className="mr-2 h-4 w-4" /> View on GitHub
                   </Link>
