@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Up Tracker
 
-## Getting Started
+Up Tracker is a personal finance tracking web app built with Next.js 15, allowing users to track their expenses and gain insights into their spending patterns. The project integrates with Up Bank (via API) and leverages Clerk for authentication and Inngest for background job processing.
 
-First, run the development server:
+## ⚠️ Disclaimer
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+**Up Tracker is an independent hobby project and is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Up Bank or its parent company, Bendigo and Adelaide Bank Limited.** All product and company names are trademarks™ or registered® trademarks of their respective holders. Use of them does not imply any affiliation or endorsement
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🚀 Features
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Sync transactions from Up Bank via API.
+- Secure storage of sensitive data using encryption.
+- Authentication via **Clerk**.
+- Background processing with **Inngest**.
+- Expense tracking and categorisation.
+- Daily, monthly, and yearly spending insights.
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## ☁️ Use in the Cloud
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+If you'd prefer to skip the hassle of setting up Up Tracker locally, you can use it on https://uptracker.com.au
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🔧 Installation (Local Setup)
 
-## Deploy on Vercel
+Before starting, **you will need to create accounts with [Clerk](https://clerk.dev/) (for authentication) and [Inngest](https://www.inngest.com/) (for background processing).** Ensure you have the necessary API keys ready.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Steps to set up the project locally:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **Clone the repository:**
+
+   ```bash
+   git clone https://github.com/mjsilva/up-tracker.git
+   cd up-tracker
+   ```
+
+2. **Install dependencies:**
+
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables:**
+
+   - Copy the provided `.env.template` file to `.env.local`:
+     ```bash
+     cp .env.template .env.local
+     ```
+   - Open `.env.local` and fill in the required values, such as database connection, encryption key, and API credentials for Clerk and Inngest.
+
+4. **Set up the database:**
+
+   ```bash
+   npx prisma migrate dev --name init
+   ```
+
+5. **Run the development server:**
+
+   ```bash
+   npm run dev
+   ```
+
+   The app will be available at **`http://localhost:3000`**.
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! To contribute:
+
+1. Fork the repository.
+2. Create a new feature branch (`git checkout -b feature-branch`).
+3. Commit your changes (`git commit -m 'Add feature'`).
+4. Push to the branch (`git push origin feature-branch`).
+5. Open a pull request.
+
+## 📜 License
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+## 📧 Contact
+
+If you have any questions or suggestions, feel free to reach out.
