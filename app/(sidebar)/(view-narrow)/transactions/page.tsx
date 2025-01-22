@@ -26,8 +26,6 @@ async function Page({
   const { upParentCategory, upCategory, dateFrom, dateTo } =
     AvailableFiltersSchema.parse(awaitedSearchParams);
 
-  console.log(AvailableFiltersSchema.parse(awaitedSearchParams));
-
   const where = {
     description: { contains: (await searchParams).search, mode: "insensitive" },
     isTransferBetweenAccounts: false,
@@ -47,8 +45,6 @@ async function Page({
         }
       : undefined),
   } satisfies Prisma.TransactionWhereInput;
-
-  console.log({ where });
 
   const totalTransactions = await prisma.transaction.count({
     where,
