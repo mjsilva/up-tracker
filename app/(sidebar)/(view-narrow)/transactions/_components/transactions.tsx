@@ -11,19 +11,17 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
 import { Transaction } from "@prisma/client";
 import { DateTime } from "luxon";
 import { cn, formatToCurrencyFromCents } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { EditIcon, EyeIcon, RefreshCcwIcon } from "lucide-react";
+import {
+  ChevronDownIcon,
+  ChevronUpIcon,
+  EditIcon,
+  EyeIcon,
+  RefreshCcwIcon,
+} from "lucide-react";
 import { startCase } from "lodash";
 import { PaginationData } from "@/lib/types";
 import { toast } from "sonner";
@@ -31,27 +29,27 @@ import { useSearchParams } from "next/navigation";
 import { Pagination } from "./pagination";
 import { syncTransactions } from "../actionts";
 import { TransactionIcon } from "./transaction-icon";
+import { FilterControls } from "./filter-controls";
+import { AvailableFiltersSchema } from "../types";
 
-const categories = [
-  "Food",
-  "Transportation",
-  "Shopping",
-  "Income",
-  "Entertainment",
-  "Bills",
-  "Other",
-];
+export type FiltersData = { categories: Record<string, string[]> };
 
 export function Transactions({
   transactions,
   paginationData,
+  filtersData,
 }: {
   transactions: Transaction[];
   paginationData: PaginationData;
+  filtersData: FiltersData;
 }) {
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get("search") || "";
-  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [showFilters, setShowFilters] = useState(() => {
+    return Object.keys(AvailableFiltersSchema.shape).some(
+      (v) => !!searchParams.get(v),
+    );
+  });
 
   async function handleSyncTransactions() {
     toast("Transactions are now syncing, refresh in a bit");
@@ -82,7 +80,7 @@ export function Transactions({
         </Button>
       </div>
 
-      <div className="flex justify-between">
+      <div className={"flex flex-col gap-2"}>
         <div className={"flex flex-col gap-4 sm:flex-row"}>
           <form method={"get"}>
             <Input
@@ -101,21 +99,21 @@ export function Transactions({
               name={"search"}
             />
           </form>
-          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className="max-w-[180px]">
-              <SelectValue placeholder="Filter by category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              {categories.map((category) => (
-                <SelectItem key={category} value={category}>
-                  {category}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Button
+            variant="outline"
+            onClick={() => setShowFilters(!showFilters)}
+            className="w-full sm:w-auto"
+          >
+            Filters
+            {showFilters ? (
+              <ChevronUpIcon className="ml-2 h-4 w-4" />
+            ) : (
+              <ChevronDownIcon className="ml-2 h-4 w-4" />
+            )}
+          </Button>
+          <Pagination paginationData={paginationData} />
         </div>
-        <Pagination paginationData={paginationData} />
+        {showFilters && <FilterControls filtersData={filtersData} />}
       </div>
 
       {/* Desktop view */}
