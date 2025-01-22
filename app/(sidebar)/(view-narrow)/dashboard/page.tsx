@@ -1,5 +1,5 @@
 import prisma from "@/lib/db";
-import { currentUserServer } from "@/lib/services/user-service";
+import { currentUserServerOrThrow } from "@/lib/services/user-service";
 import { DateTime } from "luxon";
 import { formatToCurrencyFromCents } from "@/lib/utils";
 import { ExpensesChart } from "./_components/expenses-chart";
@@ -9,7 +9,7 @@ import {
 } from "@/lib/services/transaction-service";
 
 export default async function Home() {
-  const user = await currentUserServer();
+  const user = await currentUserServerOrThrow();
 
   const now = DateTime.local();
 

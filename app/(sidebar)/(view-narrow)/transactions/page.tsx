@@ -1,6 +1,6 @@
 import React from "react";
 import prisma from "@/lib/db";
-import { currentUserServer } from "@/lib/services/user-service";
+import { currentUserServerOrThrow } from "@/lib/services/user-service";
 import { Prisma } from "@prisma/client";
 import Transactions from "./_components/transactions";
 import { AvailableFilters, AvailableFiltersSchema } from "./types";
@@ -14,7 +14,7 @@ async function Page({
   >;
 }) {
   const awaitedSearchParams = await searchParams;
-  const user = await currentUserServer();
+  const user = await currentUserServerOrThrow();
 
   const page = parseInt(awaitedSearchParams?.page || "1", 10);
   const pageSize = parseInt(awaitedSearchParams?.pageSize || "20", 10);

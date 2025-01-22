@@ -17,6 +17,7 @@ import {
 import Image from "next/image";
 import { currentUserServer } from "@/lib/services/user-service";
 import { redirect } from "next/navigation";
+import { ReactNode } from "react";
 
 async function LandingPage() {
   const user = await currentUserServer();
