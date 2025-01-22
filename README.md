@@ -19,6 +19,16 @@ Up Tracker is a personal finance tracking web app built with Next.js 15, allowin
 
 ---
 
+## 🙌 Support My Work
+
+Hey there! If you find my work useful and would like to support my efforts, consider sponsoring me. Your support helps me dedicate more time to open-source projects and continue building cool things. 💙
+
+[![Sponsor](https://img.shields.io/badge/Sponsor-%E2%9D%A4-pink?style=for-the-badge&logo=github)](https://github.com/sponsors/mjsilva)
+
+Every bit of support is greatly appreciated. Thank you! 🚀
+
+---
+
 ## ☁️ Use in the Cloud
 
 If you'd prefer to skip the hassle of setting up Up Tracker locally, you can use it on https://uptracker.com.au
