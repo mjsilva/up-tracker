@@ -4,7 +4,6 @@ import {
   LayoutDashboard,
   Menu,
   Settings,
-  Tag,
 } from "lucide-react";
 
 import {
@@ -32,11 +31,6 @@ const items = [
     title: "Transactions",
     url: "/transactions",
     icon: ArrowLeftRight,
-  },
-  {
-    title: "Categories",
-    url: "/categories",
-    icon: Tag,
   },
   {
     title: "Settings",
