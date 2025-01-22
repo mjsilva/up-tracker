@@ -8,6 +8,10 @@ import { SettingKey } from "@prisma/client";
 import { FormActionFnReturnType } from "@/lib/types";
 import { redirect } from "next/navigation";
 import { inngest } from "@/lib/ingest/client";
+import {
+  createAndSaveWebhook,
+  validateUpbankApiKey,
+} from "@/lib/services/upbank";
 
 export async function saveOnboardingFormAction(
   prevState: unknown,
@@ -27,6 +31,16 @@ export async function saveOnboardingFormAction(
   }
 
   const { apiKey } = validatedFields.data;
+
+  const isValidApiKey = await validateUpbankApiKey(apiKey);
+  if (!isValidApiKey) {
+    return {
+      validationErrors: {
+        apiKey: ["Invalid API Key. Please check and try again."],
+      },
+      isSuccess: false,
+    };
+  }
 
   const user = await currentUserServer();
 
@@ -50,6 +64,8 @@ export async function saveOnboardingFormAction(
     name: "transactions/full-sync",
     data: { userId: user.id },
   });
+
+  await createAndSaveWebhook(user.id);
 
   redirect("/");
 }

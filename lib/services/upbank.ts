@@ -327,3 +327,19 @@ export async function createAndSaveWebhook(userId: string) {
     },
   });
 }
+
+export async function validateUpbankApiKey(apiKey: string) {
+  try {
+    const response = await fetch(`${UPBANK_API_URL_BASE}/util/ping`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+      },
+    });
+
+    return response.ok;
+  } catch (error) {
+    console.error("Error validating API key:", error);
+    return false;
+  }
+}

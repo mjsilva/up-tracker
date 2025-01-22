@@ -28,8 +28,7 @@ async function Page() {
           Welcome to Up Tracker
         </h1>
         <p className="mb-4 text-left text-muted-foreground">
-          Take control of your spending with <strong>Up Tracker</strong>. Enter
-          your Up Bank API key below to sync your transactions.
+          Take control of your spending with <strong>Up Tracker</strong>.
         </p>
         <p className="mb-6 text-left text-muted-foreground">
           Once synced, you’ll be able to track your spending, categorise your
