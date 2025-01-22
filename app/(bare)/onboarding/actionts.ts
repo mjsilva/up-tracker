@@ -67,5 +67,5 @@ export async function saveOnboardingFormAction(
 
   await createAndSaveWebhook(user.id);
 
-  redirect("/");
+  redirect("/dashboard");
 }

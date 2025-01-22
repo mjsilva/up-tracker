@@ -24,7 +24,7 @@ import Link from "next/link";
 const items = [
   {
     title: "Dashboard",
-    url: "/",
+    url: "/dashboard",
     icon: LayoutDashboard,
   },
   {
@@ -44,7 +44,7 @@ export function AppSidebar() {
     <>
       <Sidebar>
         <SidebarHeader className="p-4">
-          <Link href={"/"} className="group/logo">
+          <Link href={"/dashboard"} className="group/logo">
             <h2 className="flex items-center text-2xl font-bold tracking-tight">
               <ArrowBigUpDashIcon
                 size={60}
