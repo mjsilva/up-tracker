@@ -18,6 +18,7 @@ import Image from "next/image";
 import { currentUserServer } from "@/lib/services/user-service";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
+import { FlipWords } from "@/components/ui/flip-words";
 
 async function LandingPage() {
   const user = await currentUserServer();
@@ -56,7 +57,14 @@ async function LandingPage() {
             <div className="flex flex-col items-center space-y-4 text-center">
               <div className="space-y-2">
                 <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
-                  Track Your Expenses with UP Tracker
+                  <FlipWords
+                    words={["Track", "Filter", "Search", "Analyse"]}
+                    duration={1500}
+                  />
+                  <br />
+                  <span className={"text-primary/80"}>
+                    Expenses with UP Tracker
+                  </span>
                 </h1>
                 <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl">
                   The open-source expense tracker for UP Bank. Install locally
