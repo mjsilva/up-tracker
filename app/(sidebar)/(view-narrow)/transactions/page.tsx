@@ -4,6 +4,7 @@ import { currentUserServer } from "@/lib/services/user-service";
 import { Prisma } from "@prisma/client";
 import Transactions from "./_components/transactions";
 import { AvailableFilters, AvailableFiltersSchema } from "./types";
+import { DateTime } from "luxon";
 
 async function Page({
   searchParams,
@@ -22,8 +23,10 @@ async function Page({
     throw new Error("Page size exceeded max 50 allowed");
   }
 
-  const { upParentCategory, upCategory } =
+  const { upParentCategory, upCategory, dateFrom, dateTo } =
     AvailableFiltersSchema.parse(awaitedSearchParams);
+
+  console.log(AvailableFiltersSchema.parse(awaitedSearchParams));
 
   const where = {
     description: { contains: (await searchParams).search, mode: "insensitive" },
@@ -31,7 +34,21 @@ async function Page({
     userId: user.id,
     upCategory: upCategory === "all" ? undefined : upCategory,
     upParentCategory: upParentCategory === "all" ? undefined : upParentCategory,
+    ...(dateFrom || dateTo
+      ? {
+          transactionCreatedAt: {
+            ...(dateFrom
+              ? { gte: DateTime.fromISO(dateFrom).startOf("day").toJSDate() }
+              : undefined),
+            ...(dateTo
+              ? { lte: DateTime.fromISO(dateTo).endOf("day").toJSDate() }
+              : undefined),
+          },
+        }
+      : undefined),
   } satisfies Prisma.TransactionWhereInput;
+
+  console.log({ where });
 
   const totalTransactions = await prisma.transaction.count({
     where,

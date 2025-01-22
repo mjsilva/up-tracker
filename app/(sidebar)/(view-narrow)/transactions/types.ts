@@ -4,6 +4,8 @@ import { z } from "zod";
 export const AvailableFiltersSchema = z.object({
   upParentCategory: z.string().default("all"),
   upCategory: z.string().default("all"),
+  dateFrom: z.string().nullish(),
+  dateTo: z.string().nullish(),
 });
 
 // Infer TypeScript type from schema
