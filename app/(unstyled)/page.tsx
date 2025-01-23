@@ -172,7 +172,7 @@ async function LandingPage() {
                   className="w-full bg-orange-600 hover:bg-orange-600/90"
                   asChild
                 >
-                  <Link href="/sign-up">Use Cloud Solution</Link>
+                  <Link href="/sign-up">Sign up</Link>
                 </Button>
                 <Button variant="outline" className="w-full" asChild>
                   <Link href="https://github.com/mjsilva/up-tracker">
