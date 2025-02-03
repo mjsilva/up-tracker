@@ -156,6 +156,7 @@ export function FilterControls({ filtersData }: FiltersProps) {
               handleFilterSelect(newFilters);
             }}
             numberOfMonths={2}
+            toDate={DateTime.now().toJSDate()}
           />
           <Button
             variant={"secondary"}
