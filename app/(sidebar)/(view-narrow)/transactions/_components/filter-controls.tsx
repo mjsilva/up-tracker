@@ -30,7 +30,8 @@ export function FilterControls({ filtersData }: FiltersProps) {
   const searchParams = useSearchParams();
 
   const [activeFilters, setActiveFilters] = useState<AvailableFilters>(() => {
-    return AvailableFiltersSchema.parse(searchParams);
+    const paramsObject = Object.fromEntries(searchParams.entries());
+    return AvailableFiltersSchema.parse(paramsObject);
   });
 
   const activeFiltersDateRangeJsDate = {
@@ -48,6 +49,7 @@ export function FilterControls({ filtersData }: FiltersProps) {
     const params = new URLSearchParams(searchParams.toString());
 
     Object.entries(activeFilters).forEach(([key, value]) => {
+      console.log({ key, value });
       if (value === "all" || !value) {
         params.delete(key);
       } else {
@@ -164,8 +166,8 @@ export function FilterControls({ filtersData }: FiltersProps) {
             onClick={() => {
               const newFilters = {
                 ...activeFilters,
-                dateFrom: undefined,
-                dateTo: undefined,
+                dateFrom: null,
+                dateTo: null,
               } satisfies AvailableFilters;
 
               handleFilterSelect(newFilters);
