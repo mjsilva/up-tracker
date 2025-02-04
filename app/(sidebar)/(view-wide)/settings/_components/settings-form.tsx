@@ -12,7 +12,7 @@ export function SettingsForm({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Account Settings</h1>
+        <h1 className="text-2xl font-semibold">Account</h1>
         <p className="mt-2 text-muted-foreground">
           Manage your account settings and preferences
         </p>

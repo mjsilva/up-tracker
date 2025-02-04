@@ -7,6 +7,11 @@ import {
   getDailyExpensesForLastTwoWeeks,
   getMonthlyExpensesForLastSixMonths,
 } from "@/lib/services/transaction-service";
+import { fetchAccounts } from "@/lib/services/upbank";
+import { AccountCards } from "@/app/(sidebar)/(view-narrow)/dashboard/_components/account-cards";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+export const revalidate = 3600;
 
 export default async function Home() {
   const user = await currentUserServerOrThrow();
@@ -68,29 +73,58 @@ export default async function Home() {
     userId: user.id,
   });
 
+  let accounts;
+  try {
+    accounts = await fetchAccounts({ userId: user.id });
+  } catch (e) {
+    console.error(e);
+  }
+
   return (
-    <div className="grid gap-6">
+    <div className="grid gap-10">
+      {accounts && (
+        <section>
+          <h2 className="mb-4 text-2xl font-semibold">Accounts</h2>{" "}
+          <AccountCards accounts={accounts} />
+        </section>
+      )}
       <section>
-        <h2 className="mb-4 text-2xl font-semibold">Overview</h2>
+        <h2 className="mb-4 text-2xl font-semibold">Expenses</h2>
         <div className="grid gap-4 md:grid-cols-3">
-          <div className="rounded-lg bg-card p-6 text-card-foreground shadow">
-            <h3 className="mb-2 font-medium">Today&#39;s Expenses</h3>
-            <p className="text-3xl font-bold">
-              {formatToCurrencyFromCents(dayExpenses._sum.amountValueInCents)}
-            </p>
-          </div>
-          <div className="rounded-lg bg-card p-6 text-card-foreground shadow">
-            <h3 className="mb-2 font-medium">This Month</h3>
-            <p className="text-3xl font-bold">
-              {formatToCurrencyFromCents(monthExpenses._sum.amountValueInCents)}
-            </p>
-          </div>
-          <div className="rounded-lg bg-card p-6 text-card-foreground shadow">
-            <h3 className="mb-2 font-medium">This Year</h3>
-            <p className="text-3xl font-bold">
-              {formatToCurrencyFromCents(yearExpenses._sum.amountValueInCents)}
-            </p>
-          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Today&#39;s Expenses</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl font-bold">
+                {formatToCurrencyFromCents(dayExpenses._sum.amountValueInCents)}
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>This Month</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl font-bold">
+                {formatToCurrencyFromCents(
+                  monthExpenses._sum.amountValueInCents,
+                )}
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>This Year</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl font-bold">
+                {formatToCurrencyFromCents(
+                  yearExpenses._sum.amountValueInCents,
+                )}
+              </p>
+            </CardContent>
+          </Card>
         </div>
       </section>
       <section className={"grid grid-cols-1 gap-4 md:grid-cols-2"}>
@@ -107,16 +141,6 @@ export default async function Home() {
           description={"Your expenses over the last 12 months"}
           chartColor={"--chart-2"}
         />
-      </section>
-      <section>
-        <h2 className="mb-4 text-2xl font-semibold">Recent Transactions</h2>
-        <div className="rounded-lg bg-card text-card-foreground shadow">
-          <div className="p-6">
-            <p className="text-muted-foreground">
-              Placeholder for recent transactions list
-            </p>
-          </div>
-        </div>
       </section>
     </div>
   );

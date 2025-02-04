@@ -138,3 +138,28 @@ export const UpBankWebhookPayloadSchema = z.object({
     }),
   }),
 });
+
+export const UpBankAccountTypeSchema = z.enum([
+  "SAVER",
+  "TRANSACTIONAL",
+  "HOME_LOAN",
+]);
+
+export const UpBankAccountSchema = z.object({
+  id: z.string(),
+  attributes: z.object({
+    displayName: z.string(),
+    accountType: UpBankAccountTypeSchema,
+    ownershipType: z.string(),
+    balance: MoneySchema,
+    createdAt: isoDateSchema,
+  }),
+});
+
+export const UpBankAccountsResponseSchema = z.object({
+  data: z.array(UpBankAccountSchema),
+  links: z.object({
+    prev: z.string().url().nullish(),
+    next: z.string().url().nullish(),
+  }),
+});

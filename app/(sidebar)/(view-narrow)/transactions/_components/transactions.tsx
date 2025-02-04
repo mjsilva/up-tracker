@@ -72,8 +72,7 @@ export function Transactions({
 
   return (
     <div className="flex flex-col space-y-4">
-      <div className={"flex justify-between"}>
-        <h1 className="text-2xl font-bold">Transactions</h1>
+      <div className={"flex justify-end"}>
         <Button variant={"outline"} onClick={() => handleSyncTransactions()}>
           <RefreshCcwIcon />
           Sync

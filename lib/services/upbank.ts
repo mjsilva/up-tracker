@@ -1,6 +1,7 @@
 import prisma from "@/lib/db";
 import { decrypt, encrypt } from "@/lib/encryption";
 import {
+  UpBankAccountsResponseSchema,
   UpBankApiTransactionResponseSchema,
   UpBankApiTransactionsResponseSchema,
   UpBankApiWebhookCreationsResponseSchema,
@@ -15,6 +16,7 @@ import TransactionUpdateInput = Prisma.TransactionUpdateInput;
 
 const UPBANK_API_URL_BASE = "https://api.up.com.au/api/v1";
 const UPBANK_API_URL_TRANSACTIONS = `${UPBANK_API_URL_BASE}/transactions`;
+const UPBANK_API_URL_ACCOUNTS = `${UPBANK_API_URL_BASE}/accounts`;
 const UPBANK_API_URL_WEBHOOKS = `${UPBANK_API_URL_BASE}/webhooks`;
 
 async function getUpbankUserApiKey(userId: string) {
@@ -52,6 +54,22 @@ function appendRawDataToTransaction(responseJson: any) {
       rawData: responseJson.data,
     },
   };
+}
+
+export async function fetchAccounts({ userId }: { userId: string }) {
+  const upBankApiKey = await getUpbankUserApiKey(userId);
+
+  const response = await fetch(UPBANK_API_URL_ACCOUNTS, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${upBankApiKey}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  const responseJson = await response.json();
+
+  return UpBankAccountsResponseSchema.parse(responseJson);
 }
 
 export async function fetchTransactions({
