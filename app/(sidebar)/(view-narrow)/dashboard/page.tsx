@@ -138,7 +138,7 @@ export default async function Home() {
           data={monthlyExpenses}
           dateLuxonFormat={"LLL yy"}
           title={"Monthly Expenses"}
-          description={"Your expenses over the last 12 months"}
+          description={"Your expenses over the last 6 months"}
           chartColor={"--chart-2"}
         />
       </section>
